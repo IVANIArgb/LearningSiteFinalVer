@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtualenv
+venv/
+.venv/
+
+# Logs & uploads
+backend/logs/
+backend/uploads/
+
+# OS / Editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Env
+.env
+.env.*
+
+# Node (just in case)
+node_modules/
+
+

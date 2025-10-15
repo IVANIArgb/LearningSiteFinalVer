@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>{{ title or 'LearnSite' }}</title>
+    <link rel="stylesheet" href="/templates/css/header-footer.css" />
+    <link rel="stylesheet" href="/templates/css/override-fonts.css" />
+    {% for href in page_styles %}
+      <link rel="stylesheet" href="{{ href }}" />
+    {% endfor %}
+  </head>
+  <body>
+    <div class="screen">
+      {% include 'admin-pages/templates/partials/header.html' %}
+      {{ page_body | safe }}
+      {% include 'admin-pages/templates/partials/footer.html' %}
+    </div>
+  </body>
+</html>
+
+

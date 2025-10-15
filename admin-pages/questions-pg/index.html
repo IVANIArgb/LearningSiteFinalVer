@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>LearnSite - Вопросы</title>
+    <link rel="stylesheet" href="/questions-pg/globals.css" />
+    <link rel="stylesheet" href="/questions-pg/styleguide.css" />
+    <link rel="stylesheet" href="/templates/css/header-footer.css" />
+    <link rel="stylesheet" href="/questions-pg/style.css" />
+  </head>
+  <body>
+    <div class="screen">
+      <main class="main-content">
+        <h1 class="page-title">Вопросы</h1>
+        <div class="qa-toolbar">
+          <div class="pill-filter">
+            <button class="pill active" data-filter="all">Все</button>
+            <button class="pill" data-filter="unanswered">Без ответа</button>
+            <button class="pill" data-filter="resolved">С ответом</button>
+              </div>
+          <input class="search-input" type="search" placeholder="Поиск по заголовку или описанию..." />
+              </div>
+        <section id="questions-list" class="courses-grid"></section>
+      </main>
+    </div>
+  <script>
+    (function () {
+      function el(tag, cls){ var n=document.createElement(tag); if(cls) n.className=cls; return n; }
+      function autoResize(el){ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+
+      var state = { filter: 'all', search: '' };
+
+      function renderQuestionCard(q){
+        var card = el('article','course-card');
+        var content = el('div','card-content');
+        card.appendChild(content);
+
+        var header = el('div','card-header');
+        var title = el('h3','card-title');
+        title.textContent = q.title + ' — ' + (q.author_full_name || q.author_username || '');
+        header.appendChild(title);
+        content.appendChild(header);
+
+        var main = el('div','card-main');
+        var h2 = el('h2','main-p'); h2.textContent = 'Заголовок';
+        var p = el('p','content-p'); p.textContent = q.body;
+        main.appendChild(h2); main.appendChild(p);
+        content.appendChild(main);
+
+        if (q.tags && q.tags.length){
+          var tagsC = el('div','tags-container');
+          var lbl = el('span','tags-label'); lbl.textContent='теги:';
+          var list = el('div','tags-list');
+          q.tags.forEach(function(t){ var s=el('span','tag'); s.textContent=t; list.appendChild(s); });
+          tagsC.appendChild(lbl); tagsC.appendChild(list);
+          content.appendChild(tagsC);
+        }
+
+        var answersList = el('div','answers-list');
+        content.appendChild(answersList);
+
+        // Ответ админа
+        var titleAns = el('h3','card-title-answer'); titleAns.textContent='Ответить';
+        content.appendChild(titleAns);
+
+        var notes = el('div','notes-wrapper');
+        var ta = el('textarea','notes-input'); ta.placeholder='Введите ответ...';
+        var file = el('input','file-input'); file.type='file'; file.multiple=true;
+        file.id = 'file-input-'+q.id;
+        var actions = el('div','notes-actions');
+        var attach = el('label','attach-btn'); attach.htmlFor=file.id; attach.title='Прикрепить файл'; attach.textContent='📎';
+        var send = el('button','send-btn'); send.type='button'; send.title='Отправить'; send.textContent='➤';
+        actions.appendChild(attach); actions.appendChild(send);
+        notes.appendChild(ta); notes.appendChild(file); notes.appendChild(actions);
+        var filesPreview = el('div','attached-files'); filesPreview.setAttribute('aria-live','polite');
+        content.appendChild(notes); content.appendChild(filesPreview);
+
+        function loadAnswers(){
+          fetch('/api/questions/'+q.id+'/answers').then(r=>r.json()).then(function(d){
+            answersList.innerHTML='';
+            (d.answers||[]).forEach(function(a){
+              var item = el('div','answer-item');
+              var t = el('div','answer-text');
+              t.textContent = (a.author_full_name||a.author_username||'Администратор')+': '+a.body;
+              item.appendChild(t);
+              // attachments
+              (a.attachments||[]).forEach(function(att){
+                var chip = el('div','attached-file-chip');
+                var link = el('a'); link.href=att.url; link.textContent=att.original_filename; link.download=att.original_filename; chip.appendChild(link);
+                item.appendChild(chip);
+              });
+              answersList.appendChild(item);
+            });
+          });
+        }
+        loadAnswers();
+
+        file.addEventListener('change', function(){
+          if (!file._queue) file._queue=[];
+          Array.prototype.forEach.call(file.files, function(f){ file._queue.push(f); var chip=el('div','attached-file-chip'); var a=el('a'); a.href=URL.createObjectURL(f); a.textContent=f.name; a.download=f.name; chip.appendChild(a); filesPreview.appendChild(chip); });
+          file.value='';
+        });
+
+        send.addEventListener('click', function(){
+          var body=(ta.value||'').trim(); if(!body) return;
+          fetch('/api/questions/'+q.id+'/answers', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({body})})
+            .then(function(r){ if(!r.ok) throw new Error('Ошибка ответа'); return r.json(); })
+            .then(function(res){
+              var created = res && res.answer; if (created && file._queue && file._queue.length){
+                var uploads = file._queue.map(function(f){ var fd=new FormData(); fd.append('file', f); return fetch('/answers/'+created.id+'/attachments', {method:'POST', body: fd}); });
+                Promise.allSettled(uploads).then(loadAnswers);
+              } else { loadAnswers(); }
+              ta.value=''; autoResize(ta); filesPreview.innerHTML=''; file._queue=[];
+            }).catch(console.error);
+        });
+
+        autoResize(ta);
+        return card;
+      }
+
+      function loadQuestions(){
+        var params = new URLSearchParams();
+        if (state.search) params.set('search', state.search);
+        if (state.filter==='unanswered') params.set('resolved','false');
+        if (state.filter==='resolved') params.set('resolved','true');
+        return fetch('/api/questions?'+params.toString())
+          .then(r=>r.json())
+          .then(function(d){
+            var list = document.getElementById('questions-list');
+            list.innerHTML='';
+            (d.questions||[]).forEach(function(q){ list.appendChild(renderQuestionCard(q)); });
+          });
+      }
+
+      document.querySelector('.search-input').addEventListener('input', function(e){ state.search = e.target.value.trim(); loadQuestions(); });
+      document.querySelectorAll('.pill').forEach(function(btn){ btn.addEventListener('click', function(){ document.querySelectorAll('.pill').forEach(function(b){ b.classList.remove('active'); }); btn.classList.add('active'); state.filter = btn.dataset.filter; loadQuestions(); }); });
+
+      loadQuestions();
+    })();
+  </script>
+  </body>
+</html>
+

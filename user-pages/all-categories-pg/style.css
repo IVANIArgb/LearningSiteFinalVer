@@ -1,0 +1,285 @@
+/* Основные стили для LearnSite */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #4f4f4f;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  scrollbar-color: #888 #f1f1f1; /* Ползунок и фон */
+  scrollbar-width: thin; /*  Устанавливаем тонкую полосу прокрутки */
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.main-page-user-type {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/*  Плавный скроллинг */
+html {
+  scroll-behavior: smooth;
+}
+
+.content {
+  width: 100%;
+  max-width: 2000px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header styles moved to header-footer.css */
+
+
+/* Header component styles moved to header-footer.css */
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: #242627;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.add-category-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.add-category-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #67add3;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(75, 75, 75, 0.301);
+  width: 100%;
+  max-width: 1200px;
+}
+
+.add-category-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(98, 147, 174, 0.4);
+  background: #6695af;
+}
+
+.add-category-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(98, 147, 174, 0.3);
+  background: #557c91;
+}
+
+.add-text {
+  font-weight: 500;
+}
+
+/* Courses Grid */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(375px, 100fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.course-card {
+  background-color: rgba(27, 69, 88, 0.12);
+  border-radius: 12px;
+  height: 365px;
+  padding: 0;
+  box-sizing: border-box;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  align-content: center;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-header {
+  background-color: #4f4f4f;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+  min-height: 30px;
+}
+
+.card-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #f8f6ff;
+  margin: 0;
+  text-align: center;
+}
+
+.card-main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.status-panel {
+  background: #FFF19F;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 0 12px 12px;
+  min-height: 60px;
+}
+
+.status-text {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1b4558;
+  text-transform: lowercase;
+}
+
+/* Стили для разных статусов */
+.status-panel.completed {
+  background: #B2FDAE;
+}
+
+.status-panel.not-started{
+  background: #FAC7A7 ;
+}
+
+.status-panel.in-progress {
+  background: #FFF19F;
+}
+
+.course-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer styles moved to header-footer.css */
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+  }
+
+  .add-category-btn {
+    padding: 1.25rem 1.75rem;
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .courses-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .add-category-btn {
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
+
+  .add-icon {
+    font-size: 1.3rem;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .course-card {
+    height: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .add-category-btn {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 100%;
+  }
+
+  .add-icon {
+    font-size: 1.2rem;
+  }
+
+  .course-card {
+    height: 280px;
+  }
+}

@@ -1,0 +1,494 @@
+/* Shared Header/Footer styles - v2.0 */
+
+/* Reset all header elements to ensure consistency */
+.header * {
+  box-sizing: border-box;
+}
+
+.header h1,
+.header h2,
+.header h3,
+.header h4,
+.header h5,
+.header h6 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  border: none !important;
+  outline: none !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  text-align: left !important;
+  vertical-align: baseline !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  background: none !important;
+  background-color: transparent !important;
+  position: static !important;
+  float: none !important;
+  clear: none !important;
+  z-index: auto !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  clip: auto !important;
+  clip-path: none !important;
+  mask: none !important;
+  mask-image: none !important;
+  isolation: auto !important;
+  mix-blend-mode: normal !important;
+  will-change: auto !important;
+  contain: none !important;
+  scroll-behavior: auto !important;
+  scroll-margin: 0 !important;
+  scroll-padding: 0 !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  font-feature-settings: normal !important;
+  font-variant: normal !important;
+  font-stretch: normal !important;
+  font-optical-sizing: auto !important;
+}
+
+/* Base container for all pages */
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background-color: #6293ae !important;
+  min-height: 110px !important;
+  max-height: 110px !important;
+  position: relative !important;
+  flex-wrap: wrap !important;
+  width: 100vw !important;
+  margin-left: calc(-50vw + 50%) !important;
+  padding-left: 3rem !important;
+  padding-right: 3rem !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+.logo-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  margin-right: 20px !important;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  background-color: #222222;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.letters-group {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.labels {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  margin-left: 1rem !important;
+  gap: 2px !important;
+}
+
+.site-name,
+.site-subtitle {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-size: 20px !important;
+  color: #fffafa !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  font-weight: 400 !important;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  border: none !important;
+  outline: none !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  text-align: left !important;
+  vertical-align: baseline !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  background: none !important;
+  background-color: transparent !important;
+  position: static !important;
+  float: none !important;
+  clear: none !important;
+  z-index: auto !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  clip: auto !important;
+  clip-path: none !important;
+  mask: none !important;
+  mask-image: none !important;
+  isolation: auto !important;
+  mix-blend-mode: normal !important;
+  will-change: auto !important;
+  contain: none !important;
+  scroll-behavior: auto !important;
+  scroll-margin: 0 !important;
+  scroll-padding: 0 !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  font-feature-settings: normal !important;
+  font-variant: normal !important;
+  font-stretch: normal !important;
+  font-optical-sizing: auto !important;
+}
+
+/* Ensure h1 and h2 elements in header have consistent styling */
+.header h1,
+.header h2 {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-size: 20px !important;
+  color: #fffafa !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+  font-weight: 400 !important;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  border: none !important;
+  outline: none !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  text-align: left !important;
+  vertical-align: baseline !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  background: none !important;
+  background-color: transparent !important;
+  position: static !important;
+  float: none !important;
+  clear: none !important;
+  z-index: auto !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+  clip: auto !important;
+  clip-path: none !important;
+  mask: none !important;
+  mask-image: none !important;
+  isolation: auto !important;
+  mix-blend-mode: normal !important;
+  will-change: auto !important;
+  contain: none !important;
+  scroll-behavior: auto !important;
+  scroll-margin: 0 !important;
+  scroll-padding: 0 !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  font-feature-settings: normal !important;
+  font-variant: normal !important;
+  font-stretch: normal !important;
+  font-optical-sizing: auto !important;
+}
+
+.user-label {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: #3259ac;
+  text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.39);
+  margin-top: 4px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.navigation {
+  flex: 1 1 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navigation ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  max-width: 700px;
+}
+
+.navigation li {
+  display: flex;
+  justify-content: center;
+}
+
+.navigation button,
+.navigation a {
+  width: 110px;
+  height: 28px;
+  border-radius: 45px;
+  background: rgba(84, 84, 86, 0.46);
+  box-shadow: 2px 2px 0px 2px rgba(0, 0, 0, 0.34) inset;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  color: #ff9500;
+  text-align: center;
+  line-height: 28px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: background 0.2s, color 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.navigation button:hover,
+.navigation a:hover {
+  background: #76b7d7;
+  color: #fff;
+  font-weight: 600;
+}
+
+.navigation button:active,
+.navigation a:active {
+  background: #57859c;
+  color: #c08b6d;
+  font-weight: 600;
+  cursor: default;
+}
+
+.user-info {
+  width: 240px;
+  height: 48px;
+  background: #fff;
+  border-radius: 35px;
+  box-shadow: 0 3px 3px #0000003b inset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+  padding: 0 1rem;
+}
+
+.user-name {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: #000;
+  margin-top: 0px;
+  margin-left: 10px;
+}
+
+.user-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 70px;
+  margin-right: 17px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.user-icon img {
+  width: 45px;
+  height: 45px;
+  max-width: 45px;
+  max-height: 45px;
+  object-fit: contain;
+}
+
+.footer {
+  background: linear-gradient(180deg, rgba(68, 103, 123, 1) 0%, rgba(60, 60, 60, 1) 100%);
+  padding-top: 7rem;
+  padding-bottom: 7rem;
+  padding-left: 8rem;
+  padding-right: 8rem;
+  color: #ffffff;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  border-radius: 25px;
+  box-sizing: border-box;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.description {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.25rem;
+  color: #ebebeb;
+  text-align: center;
+}
+
+.footer-nav ul {
+  display: flex;
+  gap: 2rem;
+  list-style-type: none;
+}
+
+.footer-nav a {
+  color: #b5b5b5e6;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.25rem;
+}
+
+.footer-nav a:hover {
+  color: #ffffff;
+  font-weight: 300;
+}
+
+.made-by {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  width: 100%;
+  position: relative;
+  flex-direction: column;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.made-p {
+  color: #2a2533ad;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 10000px;
+  text-decoration: none;
+  background-color:#00000000;
+}
+
+.made-company-p {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  color: #313131ec;
+  background: #00000000;
+  font-size: 0.9rem;
+  letter-spacing: 1.65px;
+}
+
+/* Media Queries */
+@media (max-width: 1200px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: unset;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .navigation ul {
+    max-width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .navigation a {
+    width: 100px;
+    height: 26px;
+    font-size: 10px;
+  }
+
+  .logo-group {
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .user-info {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .navigation ul {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .navigation li {
+    width: 100%;
+  }
+
+  .navigation a {
+    width: 100%;
+    min-width: 120px;
+  }
+
+  .user-info {
+    width: 100%;
+    min-width: unset;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .logo-group {
+    gap: 0.8rem;
+  }
+
+  .labels {
+    margin-left: 0.8rem;
+  }
+}

@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    image: learnsite:web
+    container_name: learnsite-web
+    ports:
+      - "8000:8000"
+    environment:
+      FLASK_ENV: production
+      KERBEROS_AUTH_ENABLED: "true"
+      KERBEROS_SERVICE_NAME: HTTP
+      KERBEROS_REALM: EXAMPLE.COM
+      LOG_LEVEL: INFO
+    volumes:
+      - ./:/app:ro
+      - uploads:/app/backend/uploads
+      - logs:/app/backend/logs
+    restart: unless-stopped
+
+volumes:
+  uploads:
+  logs:
+
+
+
+
+
+

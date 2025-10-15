@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>LearnSite - Вопросы</title>
+    <link rel="stylesheet" href="/questions-pg/globals.css" />
+    <link rel="stylesheet" href="/questions-pg/styleguide.css" />
+    <link rel="stylesheet" href="/templates/css/header-footer.css" />
+    <link rel="stylesheet" href="/questions-pg/style.css" />
+  </head>
+  <body>
+    <div class="screen">
+
+      <main class="main-content">
+        <h1 class="page-title">Вопросы</h1>
+        <div class="tabs">
+          <button class="tab active" data-tab="all">Все вопросы</button>
+          <button class="tab" data-tab="ask">Задать вопрос</button>
+          <button class="tab" data-tab="mine">Мои вопросы</button>
+            </div>
+
+        <section id="tab-all" class="courses-grid"></section>
+
+        <section id="tab-ask" style="display:none;">
+          <div class="course-card">
+            <div class="card-content">
+              <div class="card-header"><h3 class="card-title">Новый вопрос</h3></div>
+              <div class="card-main">
+                <input id="q-title" class="title-input" placeholder="Краткий заголовок (во всю ширину)" />
+                <textarea id="q-body" class="notes-input" placeholder="Опишите ваш вопрос ниже..."></textarea>
+              </div>
+              <div class="tags-container">
+                <span class="tags-label">теги:</span>
+                <input id="q-tags" class="title-input" placeholder="через запятую" />
+              </div>
+              <div class="notes-wrapper">
+                <input id="q-file" class="file-input" type="file" multiple />
+                <div class="notes-actions">
+                  <label class="attach-btn" for="q-file" title="Прикрепить файл">📎</label>
+                  <button id="q-send" class="send-btn" type="button" title="Отправить">➤</button>
+                </div>
+              </div>
+              <div id="q-files" class="attached-files" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-mine" class="courses-grid" style="display:none;"></section>
+      </main>
+    </div>
+  <script>
+    (function () {
+      function el(tag, cls){ var n=document.createElement(tag); if(cls) n.className=cls; return n; }
+      function autoResize(el){ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+
+      // Tabs
+      var tabs = document.querySelectorAll('.tab');
+      function setTab(name){
+        tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab===name); });
+        document.getElementById('tab-all').style.display = name==='all' ? '' : 'none';
+        document.getElementById('tab-ask').style.display = name==='ask' ? '' : 'none';
+        document.getElementById('tab-mine').style.display = name==='mine' ? '' : 'none';
+      }
+      tabs.forEach(function(t){ t.addEventListener('click', function(){ setTab(t.dataset.tab); }); });
+
+      function renderQuestionCard(q){
+        var card = el('article','course-card');
+        var content = el('div','card-content'); card.appendChild(content);
+        var header = el('div','card-header');
+        var title = el('h3','card-title'); title.textContent = q.title + ' — ' + (q.author_full_name || q.author_username || ''); header.appendChild(title);
+        content.appendChild(header);
+        var main = el('div','card-main'); var h2=el('h2','main-p'); h2.textContent='Заголовок'; var p=el('p','content-p'); p.textContent=q.body; main.appendChild(h2); main.appendChild(p); content.appendChild(main);
+        if (q.tags && q.tags.length){ var tagsC=el('div','tags-container'); var lbl=el('span','tags-label'); lbl.textContent='теги:'; var list=el('div','tags-list'); q.tags.forEach(function(t){ var s=el('span','tag'); s.textContent=t; list.appendChild(s); }); tagsC.appendChild(lbl); tagsC.appendChild(list); content.appendChild(tagsC); }
+        var answersList = el('div','answers-list'); content.appendChild(answersList);
+        fetch('/api/questions/'+q.id+'/answers').then(r=>r.json()).then(function(d){ (d.answers||[]).forEach(function(a){ var item=el('div','answer-item'); var t=el('div','answer-text'); t.textContent=(a.author_full_name||a.author_username||'Администратор')+': '+a.body; item.appendChild(t); (a.attachments||[]).forEach(function(att){ var chip=el('div','attached-file-chip'); var link=el('a'); link.href=att.url; link.textContent=att.original_filename; link.download=att.original_filename; chip.appendChild(link); item.appendChild(chip); }); answersList.appendChild(item); }); });
+        return card;
+      }
+
+      function loadAll(){
+        return fetch('/api/questions').then(r=>r.json()).then(function(d){ var list=document.getElementById('tab-all'); list.innerHTML=''; (d.questions||[]).forEach(function(q){ list.appendChild(renderQuestionCard(q)); }); });
+      }
+      function loadMine(){
+        return fetch('/api/current-user').then(r=>r.json()).then(function(u){ if(!u || !u.id){ return; } return fetch('/api/questions?mine=true').then(r=>r.json()).then(function(d){ var list=document.getElementById('tab-mine'); list.innerHTML=''; (d.questions||[]).forEach(function(q){ list.appendChild(renderQuestionCard(q)); }); }); });
+      }
+
+      // Ask form
+      var titleInput = document.getElementById('q-title');
+      var bodyInput = document.getElementById('q-body');
+      var tagsInput = document.getElementById('q-tags');
+      var fileInput = document.getElementById('q-file');
+      var filesPreview = document.getElementById('q-files');
+      var sendBtn = document.getElementById('q-send');
+      function previewFiles(){ if(!fileInput._queue) fileInput._queue=[]; Array.prototype.forEach.call(fileInput.files, function(f){ fileInput._queue.push(f); var chip=el('div','attached-file-chip'); var a=el('a'); a.href=URL.createObjectURL(f); a.textContent=f.name; a.download=f.name; chip.appendChild(a); filesPreview.appendChild(chip); }); fileInput.value=''; }
+      fileInput.addEventListener('change', previewFiles);
+      bodyInput.addEventListener('input', function(){ autoResize(bodyInput); }); autoResize(bodyInput);
+      sendBtn.addEventListener('click', function(){
+        var title=(titleInput.value||'').trim(); var body=(bodyInput.value||'').trim(); if(!title||!body) return;
+        var tags=(tagsInput.value||'').split(',').map(function(t){return t.trim();}).filter(Boolean);
+        fetch('/api/questions', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({title, body, tags})})
+          .then(function(r){ if(!r.ok) throw new Error('Ошибка создания вопроса'); return r.json(); })
+          .then(function(res){ var q=res.question; if(fileInput._queue && fileInput._queue.length){ var uploads=fileInput._queue.map(function(f){ var fd=new FormData(); fd.append('file', f); return fetch('/api/questions/'+q.id+'/attachments', {method:'POST', body: fd}); }); Promise.allSettled(uploads).then(function(){ titleInput.value=''; bodyInput.value=''; tagsInput.value=''; filesPreview.innerHTML=''; fileInput._queue=[]; loadAll(); loadMine(); setTab('all'); }); } else { titleInput.value=''; bodyInput.value=''; tagsInput.value=''; filesPreview.innerHTML=''; loadAll(); loadMine(); setTab('all'); } })
+          .catch(console.error);
+      });
+
+      loadAll().then(loadMine);
+    })();
+  </script>
+  </body>
+</html>

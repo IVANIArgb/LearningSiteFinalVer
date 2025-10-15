@@ -1,0 +1,253 @@
+body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Стилизация полосы прокрутки в Firefox */
+body {
+  scrollbar-color: #888 #f1f1f1; /* Ползунок и фон */
+  scrollbar-width: thin; /*  Устанавливаем тонкую полосу прокрутки */
+}
+
+/*  Плавный скроллинг */
+html {
+  scroll-behavior: smooth;
+}
+
+.content {
+  width: 100%;
+  max-width: 2000px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header styles moved to header-footer.css */
+
+
+/* Header component styles moved to header-footer.css */
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-title {
+  font-size: 3.125rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 3rem;
+  margin-top: 1.5rem;
+  color: #4f4f4f;
+  padding: 0;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(375px, 100fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 0;
+}
+
+.course-card {
+  background-color: rgba(27, 69, 88, 0.12);
+  border-radius: 12px;
+  height: 365px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.course-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.frame {
+  background-color: transparent;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.frame .element-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.frame .element {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  border-radius: 12px;
+  position: relative;
+  padding: 0;
+}
+
+.frame .group {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  padding: 0;
+}
+
+.frame .overlap-group {
+  position: absolute;
+  width: 100%;
+  height: 63px;
+  bottom: 0;
+  left: 0;
+  background-color: #737373;
+  border-radius: 0 0 12px 12px;
+  padding: 0;
+}
+
+.frame .text-wrapper {
+  position: absolute;
+  width: 142px;
+  top: 22px;
+  right: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.frame .love-icon {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  top: 14px;
+  left: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame .ask-icon {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  top: 14px;
+  left: 65px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame .love-icon img,
+.frame .ask-icon img {
+  width: 35px;
+  height: 35px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  padding: 0;
+}
+
+.frame .love-icon:hover,
+.frame .ask-icon:hover {
+  opacity: 0.8;
+}
+
+.frame .love-icon:focus-visible,
+.frame .ask-icon:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.frame .rectangle {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 63px);
+  top: 0;
+  left: 0;
+  background-color: #e5f7ff;
+  border-radius: 12px 12px 0 0;
+  padding: 0;
+}
+
+/* Footer styles moved to header-footer.css */
+
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 0;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+  }
+
+  .courses-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 0;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0;
+  }
+
+  .course-card {
+    height: 300px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .course-card {
+    height: 250px;
+    padding: 0;
+  }
+}

@@ -1,0 +1,388 @@
+/* Основные стили для LearnSite */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #4f4f4f;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  scrollbar-color: #888 #f1f1f1; /* Ползунок и фон */
+  scrollbar-width: thin; /*  Устанавливаем тонкую полосу прокрутки */
+}
+
+/* Screen styles moved to header-footer.css */
+
+/* removed unused: .main-page-user-type */
+
+body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/*  Плавный скроллинг */
+html {
+  scroll-behavior: smooth;
+}
+
+/* removed unused: .content container helper */
+
+/* Header styles moved to header-footer.css */
+
+/* Header component styles moved to header-footer.css */
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: #585858;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* removed unused: .add-category-section */
+
+/* removed unused: .add-category-btn:hover */
+
+/* removed unused: .add-category-btn:active */
+
+.add-text {
+  font-weight: 500;
+}
+
+/* Courses Grid */
+.courses-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4rem;
+  margin-bottom: 3rem;
+  margin-top: 2rem;
+  justify-items: stretch; /* вернуть прежнее поведение ширины */
+}
+
+.course-card {
+  background-color: rgba(27, 69, 88, 0.116); /* исходный фон карточки */
+  border-radius: 12px;
+  height: auto;
+  min-height: 300px;
+  padding: 1rem; /* внутренние отступы от краёв карточки */
+  box-sizing: border-box;
+  transition: transform 0.3s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  width: 100%; /* вернуть прежнюю ширину */
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding-left: 10px;   /* горизонтальные отступы от краёв для всех блоков */
+  padding-right: 10px;
+}
+
+.card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #494949;
+}
+
+.card-title-answer {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #494949;
+  align-self: center;
+}
+
+.card-main {
+  flex: 1;
+  padding: 2rem 1rem; /* горизонтальные отступы по 10px от краёв карточки */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff; /* белое поле с текстом */
+  border-radius: 12px;
+  width: 100%;
+}
+
+.card-main h1 {
+  color: #333;
+  font-weight: 500;
+  font-size: 25px;
+  letter-spacing: 2px;
+}
+
+/* Tags and notes (bottom controls) */
+.tags-container {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background: rgba(98, 147, 174, 0.08);
+  border: 1px solid rgba(98, 147, 174, 0.25);
+  border-radius: 10px;
+}
+
+.tags-label {
+  flex: 0 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  color: #585858;
+  margin-top: 0.25rem;
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.main-p {
+  margin-bottom: 10px;
+}
+
+.attach-btn {
+  margin-left: auto;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  background: #67add3;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-right: 10px;
+}
+
+.attach-btn:hover {
+  background: #6695af;
+}
+
+.file-input {
+  display: none;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.6rem;
+  background: rgba(98, 147, 174, 0.12);
+  color: #3b3b3b;
+  border: 1px solid rgba(98, 147, 174, 0.3);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+.notes-input {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  margin: 0;              /* вплотную к тегам */
+  padding: 0.875rem 1rem; /* ширина поля не заходит под кнопки */
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 10px 10px 12px 12px; /* TL TR BR BL */
+  outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  color: #333;
+  background: #fff;
+  resize: none;           /* высоту управляем скриптом */
+  overflow: hidden;       /* скрыть скролл, авто-рост */
+}
+
+.notes-wrapper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.notes-actions {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.notes-actions .attach-btn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #67add3;
+  color: #fff;
+  border-radius: 10px;
+  user-select: none;
+}
+
+.send-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  background: #67add3;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.send-btn:hover,
+.notes-actions .attach-btn:hover {
+  background: #6695af;
+}
+
+.answers-list {
+  margin-top: 0; /* вплотную к полю ввода */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.answer-item {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 12px;
+  background: #f5f7f9; /* немного темнее textarea */
+  color: #333;
+  line-height: 1.4;
+}
+
+.answer-text {
+  max-width: 70ch; /* ограничение ширины текста ответов */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.attached-files {
+  margin-top: 20px; /* отступ между полем ввода и контейнером файлов */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 12px; /* расстояние между прикреплёнными файлами */
+}
+
+.attached-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #3a3a3a; /* темно-серый */
+  color: #fff;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.attached-file-chip a {
+  color: #aad4ff;
+  text-decoration: underline;
+}
+
+.notes-input:focus {
+  border-color: #76b7d7;
+  box-shadow: 0 0 0 3px rgba(118, 183, 215, 0.2);
+}
+
+/* Footer styles moved to header-footer.css */
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+  }
+
+  /* removed unused: .add-category-btn in 1024px */
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* removed unused: .add-category-btn in 768px */
+
+  /* removed unused: .add-icon in 768px */
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .course-card {
+    height: auto; /* растет по содержимому */
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  /* removed unused: .add-category-btn in 480px */
+
+  /* removed unused: .add-icon in 480px */
+
+  .course-card {
+    height: auto; /* растет по содержимому */
+  }
+}
