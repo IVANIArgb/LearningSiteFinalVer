@@ -15,6 +15,7 @@ venv/
 # Logs & uploads
 backend/logs/
 backend/uploads/
+backend/users_courses.db
 
 # OS / Editors
 .DS_Store
