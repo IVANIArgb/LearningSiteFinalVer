@@ -129,23 +129,74 @@ def register_routes(app: Flask) -> None:
     @app.get("/user/info-test")
     def user_info_test():
         from flask import g
+        from .models import db_manager, User, KerberosUser
+        
         info = g.get('user_info', {}) or {}
         if not info.get('username'):
             return jsonify({'error': 'Пользователь не аутентифицирован'}), 401
-        # Возвращаем только контекст аутентификации, без обращений к БД
+        
+        username = info.get('username')
         payload = {
             'authenticated': True,
-            'username': info.get('username'),
-            'full_name': info.get('full_name'),
+            'username': username,
             'role': info.get('role', 'user'),
             'auth_method': info.get('auth_method'),
             'ip_address': info.get('ip_address'),
             'hostname': info.get('hostname'),
         }
+        
+        # Добавляем данные из g.user_info (из контекста аутентификации)
+        if 'full_name' in info:
+            payload['full_name'] = info.get('full_name')
+        if 'surname' in info:
+            payload['surname'] = info.get('surname')
+        if 'fst_name' in info:
+            payload['fst_name'] = info.get('fst_name')
+        if 'sec_name' in info:
+            payload['sec_name'] = info.get('sec_name')
+        if 'department' in info:
+            payload['department'] = info.get('department')
+        if 'position' in info:
+            payload['position'] = info.get('position')
         if 'principal' in info:
             payload['principal'] = info.get('principal')
         if 'domain' in info:
             payload['domain'] = info.get('domain')
+        
+        # Дополняем данными из БД (приоритет БД над контекстом)
+        try:
+            session = db_manager.get_session()
+            try:
+                # Пробуем получить данные из KerberosUser
+                ku = session.query(KerberosUser).filter(KerberosUser.username == username.lower()).first()
+                if ku:
+                    payload['surname'] = ku.surname or payload.get('surname', '')
+                    payload['fst_name'] = ku.fst_name or payload.get('fst_name', '')
+                    payload['sec_name'] = ku.sec_name or payload.get('sec_name', '')
+                    payload['department'] = ku.department or payload.get('department', '')
+                    payload['position'] = ku.position or payload.get('position', '')
+                    payload['full_name'] = ku._get_full_name_from_parts() or ku.full_name or payload.get('full_name', '')
+                    payload['role'] = ku.role
+                    payload['email'] = ku.email or ''
+                    payload['last_login'] = ku.last_login.isoformat() if ku.last_login else None
+                else:
+                    # Если нет KerberosUser, пробуем User
+                    user = session.query(User).filter(User.username == username.lower()).first()
+                    if user:
+                        payload['surname'] = user.surname or payload.get('surname', '')
+                        payload['fst_name'] = user.fst_name or payload.get('fst_name', '')
+                        payload['sec_name'] = user.sec_name or payload.get('sec_name', '')
+                        payload['department'] = user.department or payload.get('department', '')
+                        payload['position'] = user.position or payload.get('position', '')
+                        payload['full_name'] = user._get_full_name_from_parts() or user.full_name or payload.get('full_name', '')
+                        payload['email'] = user.email or ''
+            finally:
+                session.close()
+        except Exception as e:
+            # Если ошибка при получении данных из БД, просто логируем
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to get user data from DB: {e}")
+        
         return jsonify(payload)
 
     # Serve uploaded files (Q&A attachments)
@@ -186,11 +237,19 @@ def register_routes(app: Flask) -> None:
         else:
             template_name = "user-pages/templates/base_static_page.html"
         
+        # Получаем контекст пользователя для отображения ФИО/логина в шапке
+        username_ctx = user_info.get('username') if user_info else None
+        full_name_ctx = user_info.get('full_name') if user_info else None
+        role_ctx = user_info.get('role') if user_info else None
+
         return render_template(
             template_name,
             title=None,
             page_styles=parts["page_styles"],
             page_body=parts["body_inner"],
+            username=username_ctx,
+            full_name=full_name_ctx,
+            role=role_ctx,
         )
 
     # Serve pages via friendly URLs (e.g., /main, /questions)

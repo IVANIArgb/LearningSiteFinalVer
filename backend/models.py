@@ -20,8 +20,12 @@ class User(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(100), unique=True, nullable=False, index=True)
-    full_name = Column(String(200), nullable=False)
+    full_name = Column(String(200), nullable=True)  # Оставляем для обратной совместимости
+    surname = Column(String(100), nullable=True)  # Фамилия
+    fst_name = Column(String(100), nullable=True)  # Имя
+    sec_name = Column(String(100), nullable=True)  # Отчество
     department = Column(String(100), nullable=False)
+    position = Column(String(100), nullable=True)  # Должность
     email = Column(String(200), unique=True, nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=func.now())
@@ -41,8 +45,12 @@ class User(Base):
         return {
             'id': self.id,
             'username': self.username,
-            'full_name': self.full_name,
+            'full_name': self.full_name or self._get_full_name_from_parts(),
+            'surname': self.surname or '',
+            'fst_name': self.fst_name or '',
+            'sec_name': self.sec_name or '',
             'department': self.department,
+            'position': self.position or '',
             'email': self.email,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -50,6 +58,17 @@ class User(Base):
             'courses_completed': len([cp for cp in self.course_progress if cp.is_completed]),
             'total_lessons_completed': sum(cp.lessons_completed for cp in self.course_progress)
         }
+    
+    def _get_full_name_from_parts(self) -> str:
+        """Собирает полное имя из частей."""
+        parts = []
+        if self.surname:
+            parts.append(self.surname)
+        if self.fst_name:
+            parts.append(self.fst_name)
+        if self.sec_name:
+            parts.append(self.sec_name)
+        return ' '.join(parts) if parts else ''
 
 
 class Course(Base):
@@ -580,14 +599,29 @@ class KerberosUser(Base):
     username = Column(String(100), nullable=False, unique=True, index=True)
     principal = Column(String(200), nullable=False, unique=True, index=True)  # username@REALM
     realm = Column(String(100), nullable=False, index=True)
-    full_name = Column(String(200), nullable=True)
+    full_name = Column(String(200), nullable=True)  # Оставляем для обратной совместимости
+    surname = Column(String(100), nullable=True)  # Фамилия
+    fst_name = Column(String(100), nullable=True)  # Имя
+    sec_name = Column(String(100), nullable=True)  # Отчество
     department = Column(String(100), nullable=True)
+    position = Column(String(100), nullable=True)  # Должность
     email = Column(String(200), nullable=True)
     role = Column(String(20), nullable=False, default='user')
     is_active = Column(Boolean, default=True)
     last_login = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    def _get_full_name_from_parts(self) -> str:
+        """Собирает полное имя из частей."""
+        parts = []
+        if self.surname:
+            parts.append(self.surname)
+        if self.fst_name:
+            parts.append(self.fst_name)
+        if self.sec_name:
+            parts.append(self.sec_name)
+        return ' '.join(parts) if parts else ''
     
     def __repr__(self):
         return f"<KerberosUser(username='{self.username}', principal='{self.principal}', role='{self.role}')>"
