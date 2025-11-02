@@ -1,0 +1,776 @@
+{
+  "root_directory": "C:\\Users\\Пользователь\\Desktop\\Learning Site Final\\site",
+  "statistics": {
+    "python": {
+      "files_count": 19,
+      "total_lines": 3914,
+      "errors_count": 0
+    },
+    "javascript": {
+      "files_count": 0,
+      "total_lines": 0,
+      "errors_count": 0
+    },
+    "html": {
+      "files_count": 20,
+      "total_lines": 2395,
+      "errors_count": 0
+    },
+    "css": {
+      "files_count": 46,
+      "total_lines": 8427,
+      "errors_count": 0
+    },
+    "other": {
+      "files_count": 29,
+      "total_lines": 3176,
+      "errors_count": 0
+    }
+  },
+  "files": {
+    "python": [
+      {
+        "path": "backend\\ad_user_info.py",
+        "lines": 420,
+        "errors": []
+      },
+      {
+        "path": "backend\\api.py",
+        "lines": 671,
+        "errors": []
+      },
+      {
+        "path": "backend\\config.py",
+        "lines": 103,
+        "errors": []
+      },
+      {
+        "path": "backend\\errors.py",
+        "lines": 25,
+        "errors": []
+      },
+      {
+        "path": "backend\\migrate_add_user_fields.py",
+        "lines": 85,
+        "errors": []
+      },
+      {
+        "path": "backend\\models.py",
+        "lines": 658,
+        "errors": []
+      },
+      {
+        "path": "backend\\real_kerberos_auth.py",
+        "lines": 381,
+        "errors": []
+      },
+      {
+        "path": "backend\\routes.py",
+        "lines": 326,
+        "errors": []
+      },
+      {
+        "path": "backend\\simplified_real_kerberos_auth.py",
+        "lines": 316,
+        "errors": []
+      },
+      {
+        "path": "backend\\utils\\logging_config.py",
+        "lines": 45,
+        "errors": []
+      },
+      {
+        "path": "backend\\wsgi.py",
+        "lines": 11,
+        "errors": []
+      },
+      {
+        "path": "backend\\__init__.py",
+        "lines": 48,
+        "errors": []
+      },
+      {
+        "path": "check_my_username.py",
+        "lines": 66,
+        "errors": []
+      },
+      {
+        "path": "full_project_analysis.py",
+        "lines": 337,
+        "errors": []
+      },
+      {
+        "path": "run.py",
+        "lines": 8,
+        "errors": []
+      },
+      {
+        "path": "simple_init_kerberos_db.py",
+        "lines": 152,
+        "errors": []
+      },
+      {
+        "path": "test_auth.py",
+        "lines": 60,
+        "errors": []
+      },
+      {
+        "path": "test_database.py",
+        "lines": 83,
+        "errors": []
+      },
+      {
+        "path": "test_role_system.py",
+        "lines": 119,
+        "errors": []
+      }
+    ],
+    "javascript": [],
+    "html": [
+      {
+        "path": "admin-pages\\all-categories-pg\\index.html",
+        "lines": 123,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-courses-pg\\index.html",
+        "lines": 219,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-lessons-pg\\index.html",
+        "lines": 29,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\lessons-content-pg\\index.html",
+        "lines": 81,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\main-pg\\index.html",
+        "lines": 73,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\questions-pg\\index.html",
+        "lines": 144,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\templates\\partials\\footer.html",
+        "lines": 17,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\templates\\partials\\full_test.html",
+        "lines": 55,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\templates\\partials\\header.html",
+        "lines": 34,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\users-info-pg\\index.html",
+        "lines": 386,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-categories-pg\\index.html",
+        "lines": 122,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-courses-pg\\index.html",
+        "lines": 219,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-lessons-pg\\index.html",
+        "lines": 140,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\lessons-content-pg\\index.html",
+        "lines": 82,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\main-pg\\index.html",
+        "lines": 73,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\questions-pg\\index.html",
+        "lines": 110,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\templates\\partials\\footer.html",
+        "lines": 16,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\templates\\partials\\full_test.html",
+        "lines": 54,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\templates\\partials\\header.html",
+        "lines": 33,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\users-info-pg\\index.html",
+        "lines": 385,
+        "errors": []
+      }
+    ],
+    "css": [
+      {
+        "path": "admin-pages\\all-categories-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-categories-pg\\style.css",
+        "lines": 285,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-categories-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-courses-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-courses-pg\\style.css",
+        "lines": 253,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-courses-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-lessons-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-lessons-pg\\style.css",
+        "lines": 143,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\all-lessons-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\lessons-content-pg\\globals.css",
+        "lines": 136,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\lessons-content-pg\\style.css",
+        "lines": 332,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\lessons-content-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\main-pg\\globals.css",
+        "lines": 35,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\main-pg\\style.css",
+        "lines": 206,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\main-pg\\styleguide.css",
+        "lines": 106,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\questions-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\questions-pg\\style.css",
+        "lines": 388,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\questions-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\templates\\css\\header-footer.css",
+        "lines": 494,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\templates\\css\\override-fonts.css",
+        "lines": 9,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\users-info-pg\\globals.css",
+        "lines": 22,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\users-info-pg\\style.css",
+        "lines": 493,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\users-info-pg\\styleguide.css",
+        "lines": 106,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-categories-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-categories-pg\\style.css",
+        "lines": 285,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-categories-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-courses-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-courses-pg\\style.css",
+        "lines": 253,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-courses-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-lessons-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-lessons-pg\\style.css",
+        "lines": 143,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\all-lessons-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\lessons-content-pg\\globals.css",
+        "lines": 136,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\lessons-content-pg\\style.css",
+        "lines": 332,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\lessons-content-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\main-pg\\globals.css",
+        "lines": 35,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\main-pg\\style.css",
+        "lines": 207,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\main-pg\\styleguide.css",
+        "lines": 106,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\questions-pg\\globals.css",
+        "lines": 135,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\questions-pg\\style.css",
+        "lines": 388,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\questions-pg\\styleguide.css",
+        "lines": 133,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\templates\\css\\header-footer.css",
+        "lines": 494,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\templates\\css\\override-fonts.css",
+        "lines": 9,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\users-info-pg\\globals.css",
+        "lines": 22,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\users-info-pg\\style.css",
+        "lines": 493,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\users-info-pg\\styleguide.css",
+        "lines": 106,
+        "errors": []
+      }
+    ],
+    "other": [
+      {
+        "path": "admin-pages\\main-pg\\css-blocks-cheatsheet.md",
+        "lines": 85,
+        "errors": []
+      },
+      {
+        "path": "admin-pages\\main-pg\\css-cheatsheet.md",
+        "lines": 0,
+        "errors": []
+      },
+      {
+        "path": "AUTONOMOUS_DEBUG_REPORT.md",
+        "lines": 259,
+        "errors": []
+      },
+      {
+        "path": "AUTO_REGISTRATION_DOCUMENTATION.md",
+        "lines": 216,
+        "errors": []
+      },
+      {
+        "path": "CLEANUP_REPORT.md",
+        "lines": 109,
+        "errors": []
+      },
+      {
+        "path": "COMPATIBILITY_CHECK_REPORT.md",
+        "lines": 132,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\CODE_CHECK_REPORT.md",
+        "lines": 141,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\DATABASE_DOCUMENTATION.md",
+        "lines": 262,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\GEMINI.md",
+        "lines": 0,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\KERBEROS_AUTH_DOCUMENTATION.md",
+        "lines": 176,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\MAC_AUTH_DOCUMENTATION.md",
+        "lines": 264,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\QUICK_START.md",
+        "lines": 75,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\REAL_KERBEROS_DOCUMENTATION.md",
+        "lines": 110,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\ROLE_SYSTEM_DOCUMENTATION.md",
+        "lines": 175,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\ROLE_SYSTEM_GUIDE.md",
+        "lines": 176,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\ROUTING_SYSTEM_DOCUMENTATION.md",
+        "lines": 226,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\tasks_tracker.md",
+        "lines": 172,
+        "errors": []
+      },
+      {
+        "path": "doc's & md's\\WINDOWS_AUTH_SETUP.md",
+        "lines": 168,
+        "errors": []
+      },
+      {
+        "path": "docker-compose.yml",
+        "lines": 30,
+        "errors": []
+      },
+      {
+        "path": "kerberos\\conf\\kdc.conf",
+        "lines": 18,
+        "errors": []
+      },
+      {
+        "path": "kerberos\\conf\\krb5.conf",
+        "lines": 26,
+        "errors": []
+      },
+      {
+        "path": "krb5.conf",
+        "lines": 26,
+        "errors": []
+      },
+      {
+        "path": "README.md",
+        "lines": 104,
+        "errors": []
+      },
+      {
+        "path": "requirements.txt",
+        "lines": 7,
+        "errors": []
+      },
+      {
+        "path": "ROLE_FIELD_ADDED.md",
+        "lines": 73,
+        "errors": []
+      },
+      {
+        "path": "setup_kerberos.bat",
+        "lines": 33,
+        "errors": []
+      },
+      {
+        "path": "setup_kerberos.sh",
+        "lines": 28,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\main-pg\\css-blocks-cheatsheet.md",
+        "lines": 85,
+        "errors": []
+      },
+      {
+        "path": "user-pages\\main-pg\\css-cheatsheet.md",
+        "lines": 0,
+        "errors": []
+      }
+    ]
+  },
+  "errors": [],
+  "directory_structure": {
+    "admin-pages\\all-categories-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "admin-pages\\all-courses-pg": {
+      "files": 5,
+      "subdirs": []
+    },
+    "admin-pages\\all-lessons-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "admin-pages\\lessons-content-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "admin-pages\\main-pg": {
+      "files": 6,
+      "subdirs": []
+    },
+    "admin-pages\\questions-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "admin-pages\\templates\\css": {
+      "files": 2,
+      "subdirs": []
+    },
+    "admin-pages\\templates\\partials": {
+      "files": 3,
+      "subdirs": []
+    },
+    "admin-pages\\templates": {
+      "files": 0,
+      "subdirs": [
+        "css",
+        "partials"
+      ]
+    },
+    "admin-pages\\users-info-pg": {
+      "files": 5,
+      "subdirs": []
+    },
+    "admin-pages": {
+      "files": 0,
+      "subdirs": [
+        "all-categories-pg",
+        "all-courses-pg",
+        "all-lessons-pg",
+        "lessons-content-pg",
+        "main-pg",
+        "questions-pg",
+        "templates",
+        "users-info-pg"
+      ]
+    },
+    "backend\\logs": {
+      "files": 1,
+      "subdirs": []
+    },
+    "backend\\utils": {
+      "files": 1,
+      "subdirs": []
+    },
+    "backend": {
+      "files": 12,
+      "subdirs": [
+        "logs",
+        "utils"
+      ]
+    },
+    "doc's & md's": {
+      "files": 12,
+      "subdirs": []
+    },
+    "docker image": {
+      "files": 1,
+      "subdirs": []
+    },
+    "kerberos\\conf": {
+      "files": 2,
+      "subdirs": []
+    },
+    "kerberos\\keytabs": {
+      "files": 1,
+      "subdirs": []
+    },
+    "kerberos": {
+      "files": 0,
+      "subdirs": [
+        "conf",
+        "keytabs",
+        "logs"
+      ]
+    },
+    "user-pages\\all-categories-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "user-pages\\all-courses-pg": {
+      "files": 5,
+      "subdirs": []
+    },
+    "user-pages\\all-lessons-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "user-pages\\lessons-content-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "user-pages\\main-pg": {
+      "files": 6,
+      "subdirs": []
+    },
+    "user-pages\\questions-pg": {
+      "files": 4,
+      "subdirs": []
+    },
+    "user-pages\\templates\\css": {
+      "files": 2,
+      "subdirs": []
+    },
+    "user-pages\\templates\\partials": {
+      "files": 3,
+      "subdirs": []
+    },
+    "user-pages\\templates": {
+      "files": 0,
+      "subdirs": [
+        "css",
+        "partials"
+      ]
+    },
+    "user-pages\\users-info-pg": {
+      "files": 5,
+      "subdirs": []
+    },
+    "user-pages": {
+      "files": 0,
+      "subdirs": [
+        "all-categories-pg",
+        "all-courses-pg",
+        "all-lessons-pg",
+        "lessons-content-pg",
+        "main-pg",
+        "questions-pg",
+        "templates",
+        "users-info-pg"
+      ]
+    },
+    ".": {
+      "files": 21,
+      "subdirs": [
+        "admin-pages",
+        "backend",
+        "doc's & md's",
+        "docker image",
+        "kerberos",
+        "user-pages"
+      ]
+    }
+  }
+}

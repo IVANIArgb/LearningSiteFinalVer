@@ -1,340 +1,195 @@
 """
-Модуль для получения информации о пользователе из Active Directory.
+Модуль для получения информации о пользователях из Active Directory через PowerShell.
 """
+
 import subprocess
 import json
-import re
 import logging
 from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
+# Кэш для проверки наличия модуля ActiveDirectory
+_ad_module_available = None
+
+
+def _check_ad_module_available() -> bool:
+    """Проверяет, доступен ли модуль ActiveDirectory PowerShell."""
+    global _ad_module_available
+    if _ad_module_available is not None:
+        return _ad_module_available
+    
+    try:
+        result = subprocess.run(
+            ['powershell', '-Command', 'Get-Module -ListAvailable -Name ActiveDirectory'],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        _ad_module_available = result.returncode == 0 and 'ActiveDirectory' in result.stdout
+        return _ad_module_available
+    except Exception:
+        _ad_module_available = False
+        return False
+
 
 class ADUserInfo:
-    """
-    Класс для поиска информации о пользователе в Active Directory по логину
-    """
-
+    """Класс для получения информации о пользователе из Active Directory."""
+    
     def __init__(self, login: str):
         self.login = login
-        self.user_data = {}
-        self.result = {
-            'first_name': 'Не указано',
-            'second_name': 'Не указано',
-            'sur_name': 'Не указано',
-            'department': 'Не указано',
-            'position': 'Не указано'
-        }
-
-    def get_user_info(self) -> dict:
-        """
-        Основной метод для получения информации о пользователе
-
-        Returns:
-            dict: Словарь с информацией о пользователе
-        """
-        if not self._fetch_user_data():
-            self._set_error_state()
-            return self.result
-
-        self._extract_basic_info()
-        self._extract_middle_name()
-        self._extract_department()
-        self._extract_position()
-
-        return self.result
-
+        self.data: Dict[str, any] = {}
+        self.error: Optional[str] = None
+    
+    def _escape_powershell_string(self, value: str) -> str:
+        """Экранирует строку для безопасного использования в PowerShell команде."""
+        if not value:
+            return '""'
+        escaped = value.replace("'", "''")
+        return f"'{escaped}'"
+    
     def _fetch_user_data(self) -> bool:
-        """
-        Получает данные пользователя из Active Directory
-
-        Returns:
-            bool: Успешно ли получены данные
-        """
-        command = f'''
-        Get-ADUser -Identity "{self.login}" -Properties GivenName, Surname, MiddleName, Name, 
-                    DisplayName, Department, Title, Company, Office, Description |
-        Select-Object GivenName, Surname, MiddleName, Name, DisplayName, 
-                    Department, Title, Company, Office, Description |
-        ConvertTo-Json -Depth 1
-        '''
-
+        """Получает данные пользователя из AD через PowerShell."""
+        if not _check_ad_module_available():
+            logger.debug("ActiveDirectory PowerShell module not available, skipping AD query")
+            return False
+        
         try:
+            escaped_login = self._escape_powershell_string(self.login)
+            command = f'''
+            Import-Module ActiveDirectory -ErrorAction SilentlyContinue
+            $login = {escaped_login}
+            try {{
+                $user = Get-ADUser -Identity $login -Properties GivenName, Surname, MiddleName, Name,
+                        DisplayName, Department, Title, Company, Office, Description -ErrorAction Stop
+                $user | Select-Object GivenName, Surname, MiddleName, Name, DisplayName,
+                        Department, Title, Company, Office, Description |
+                ConvertTo-Json -Depth 1
+            }} catch {{
+                exit 1
+            }}
+            '''
+            
             result = subprocess.run(
-                ["powershell", "-Command", command],
+                ['powershell', '-Command', command],
                 capture_output=True,
                 text=True,
-                timeout=20,
-                encoding='cp866'
+                timeout=10
             )
-
-            if result.returncode == 0 and result.stdout.strip():
-                self.user_data = json.loads(result.stdout)
+            
+            if result.returncode != 0:
+                logger.debug(f"PowerShell command failed for user {self.login}: {result.stderr}")
+                return False
+            
+            if not result.stdout or not result.stdout.strip():
+                logger.debug(f"No output from PowerShell for user {self.login}")
+                return False
+            
+            try:
+                self.data = json.loads(result.stdout)
                 return True
+            except json.JSONDecodeError as e:
+                logger.debug(f"Failed to parse JSON from PowerShell output: {e}")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            logger.debug(f"PowerShell command timeout for user {self.login}")
             return False
-
         except Exception as e:
-            logger.warning(f"Failed to fetch AD data for {self.login}: {e}")
+            logger.debug(f"Error executing PowerShell command: {e}")
             return False
-
+    
     def _extract_basic_info(self):
-        """Извлекает основную информацию о пользователе"""
-        # Получаем основные данные из стандартных атрибутов
-        self.result['first_name'] = self.user_data.get('GivenName', '')
-        self.result['sur_name'] = self.user_data.get('Surname', '')
-        self.result['second_name'] = self.user_data.get('MiddleName', '')
-
-        # Если имя или фамилия не найдены, пробуем извлечь из полного имени
-        full_name = self.user_data.get('Name', '')
-        if full_name and (not self.result['first_name'] or not self.result['sur_name']):
-            parsed_name = self._parse_full_name(full_name)
-            if not self.result['first_name']:
-                self.result['first_name'] = parsed_name['first_name']
-            if not self.result['sur_name']:
-                self.result['sur_name'] = parsed_name['sur_name']
-
+        """Извлекает базовую информацию из данных AD."""
+        given_name = self.data.get('GivenName', '')
+        surname = self.data.get('Surname', '')
+        middle_name = self.data.get('MiddleName', '')
+        display_name = self.data.get('DisplayName', '')
+        
+        return {
+            'first_name': given_name or '',
+            'sur_name': surname or '',
+            'second_name': middle_name or '',
+            'display_name': display_name or ''
+        }
+    
     def _extract_middle_name(self):
-        """Извлекает отчество из различных атрибутов"""
-        if self.result['second_name']:
-            return
-
-        # Пробуем найти отчество в других атрибутах
-        self.result['second_name'] = self._find_middle_name_in_attributes()
-
-        # Если все еще не найдено, пробуем из полного имени
-        if not self.result['second_name']:
-            full_name = self.user_data.get('Name', '')
-            if full_name:
-                name_parts = full_name.split()
-                if len(name_parts) >= 3 and self._is_middle_name(name_parts[2]):
-                    self.result['second_name'] = name_parts[2]
-
-    def _extract_department(self):
-        """Извлекает информацию об отделе"""
-        department = self.user_data.get('Department', '')
+        """Извлекает отчество из различных источников."""
+        middle_name = self.data.get('MiddleName', '')
+        if middle_name:
+            return middle_name
+        
+        display_name = self.data.get('DisplayName', '')
+        if display_name:
+            name_parts = display_name.split()
+            if len(name_parts) >= 3:
+                return name_parts[2]
+        
+        return ''
+    
+    def _extract_department(self) -> str:
+        """Извлекает отдел из данных AD."""
+        department = self.data.get('Department', '')
         if department:
-            self.result['department'] = department
-        else:
-            self.result['department'] = self._find_department_in_attributes()
-
-    def _extract_position(self):
-        """Извлекает информацию о должности"""
-        position = self.user_data.get('Title', '')
-        if position:
-            self.result['position'] = position
-        else:
-            self.result['position'] = self._find_position_in_attributes()
-
-    def _find_middle_name_in_attributes(self) -> str:
-        """
-        Ищет отчество во всех возможных атрибутах AD
-
-        Returns:
-            str: Найденное отчество или пустая строка
-        """
-        attributes_to_check = ['DisplayName', 'Description']
-
-        for attr in attributes_to_check:
-            value = self.user_data.get(attr, '')
-            if value:
-                middle_name = self._extract_middle_name_from_text(value)
-                if middle_name:
-                    return middle_name
-
+            return department
+        
+        # Пробуем найти в других полях
+        description = self.data.get('Description', '')
+        if 'отдел' in description.lower() or 'department' in description.lower():
+            return description
+        
+        return 'Общий отдел'
+    
+    def _extract_position(self) -> str:
+        """Извлекает должность из данных AD."""
+        title = self.data.get('Title', '')
+        if title:
+            return title
+        
         return ''
-
-    def _extract_middle_name_from_text(self, text: str) -> str:
-        """
-        Извлекает отчество из текста используя регулярные выражения
-
-        Args:
-            text: Текст для поиска отчества
-
-        Returns:
-            str: Найденное отчество или пустая строка
-        """
-        if not text:
-            return ''
-
-        patterns = [
-            r'\b([А-Я][а-я]*ович)\b',
-            r'\b([А-Я][а-я]*евич)\b',
-            r'\b([А-Я][а-я]*овна)\b',
-            r'\b([А-Я][а-я]*евна)\b',
-            r'\b([А-Я][а-я]*ич)\b',
-            r'\b([А-Я][а-я]*ична)\b'
-        ]
-
-        for pattern in patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                return match.group(1)
-
-        return ''
-
-    def _is_middle_name(self, word: str) -> bool:
-        """
-        Проверяет, является ли слово отчеством
-
-        Args:
-            word: Слово для проверки
-
-        Returns:
-            bool: True если слово является отчеством
-        """
-        if not word:
-            return False
-
-        middle_name_endings = [
-            'ович', 'евич', 'овна', 'евна', 'ич', 'ична'
-        ]
-
-        return any(word.lower().endswith(ending) for ending in middle_name_endings)
-
-    def _parse_full_name(self, full_name: str) -> dict:
-        """
-        Парсит полное имя на составляющие
-
-        Args:
-            full_name: Полное имя пользователя
-
-        Returns:
-            dict: Разобранные компоненты имени
-        """
-        if not full_name:
-            return {'first_name': '', 'second_name': '', 'sur_name': ''}
-
-        parts = full_name.split()
-
-        if len(parts) == 1:
-            return {'first_name': '', 'second_name': '', 'sur_name': parts[0]}
-        elif len(parts) == 2:
-            return {'first_name': parts[1], 'second_name': '', 'sur_name': parts[0]}
-        elif len(parts) == 3:
-            if self._is_middle_name(parts[2]):
-                return {'first_name': parts[1], 'second_name': parts[2], 'sur_name': parts[0]}
-            else:
-                return {'first_name': parts[1], 'second_name': '', 'sur_name': parts[0]}
-        else:
-            for i in range(2, len(parts)):
-                if self._is_middle_name(parts[i]):
-                    return {
-                        'first_name': parts[1],
-                        'second_name': parts[i],
-                        'sur_name': parts[0]
-                    }
-            return {'first_name': parts[1], 'second_name': '', 'sur_name': parts[0]}
-
-    def _find_department_in_attributes(self) -> str:
-        """
-        Ищет информацию об отделе в различных атрибутах AD
-
-        Returns:
-            str: Найденный отдел или пустая строка
-        """
-        # Компания иногда содержит отдел
-        company = self.user_data.get('Company', '')
-        if company and any(word in company.lower() for word in ['отдел', 'департамент', 'управление', 'служба']):
-            return company
-
-        # Офис может содержать информацию об отделе
-        office = self.user_data.get('Office', '')
-        if office and any(word in office.lower() for word in ['отдел', 'кабинет', 'офис']):
-            return office
-
-        # Описание может содержать отдел
-        description = self.user_data.get('Description', '')
-        if description:
-            dept_patterns = [
-                r'отдел[а-я]*\s+([^.,!?]+)',
-                r'департамент[а-я]*\s+([^.,!?]+)',
-                r'управление[а-я]*\s+([^.,!?]+)',
-                r'служб[а-я]*\s+([^.,!?]+)'
-            ]
-
-            for pattern in dept_patterns:
-                match = re.search(pattern, description, re.IGNORECASE)
-                if match:
-                    return match.group(1).strip()
-
-        return ''
-
-    def _find_position_in_attributes(self) -> str:
-        """
-        Ищет информацию о должности в различных атрибутах AD
-
-        Returns:
-            str: Найденная должность или пустая строка
-        """
-        # Описание может содержать должность
-        description = self.user_data.get('Description', '')
-        if description:
-            position_patterns = [
-                r'должность[а-я]*\s*:\s*([^.,!?]+)',
-                r'позиция[а-я]*\s*:\s*([^.,!?]+)',
-                r'([А-Я][а-я]+\s+[А-Я][а-я]+)\s+отдел',
-                r'([А-Я][а-я]+\s+[А-Я][а-я]+)\s+департамент'
-            ]
-
-            for pattern in position_patterns:
-                match = re.search(pattern, description, re.IGNORECASE)
-                if match:
-                    return match.group(1).strip()
-
-        # DisplayName иногда содержит должность
-        display_name = self.user_data.get('DisplayName', '')
-        if display_name and any(
-                word in display_name.lower() for word in ['инженер', 'менеджер', 'специалист', 'руководитель']):
-            return self._extract_position_from_display_name(display_name)
-
-        return ''
-
-    def _extract_position_from_display_name(self, display_name: str) -> str:
-        """
-        Извлекает должность из DisplayName
-
-        Args:
-            display_name: DisplayName пользователя
-
-        Returns:
-            str: Извлеченная должность или пустая строка
-        """
-        positions = [
-            'инженер', 'менеджер', 'специалист', 'руководитель', 'директор',
-            'начальник', 'заместитель', 'главный', 'ведущий', 'старший',
-            'младший', 'аналитик', 'разработчик', 'администратор', 'координатор'
-        ]
-
-        words = display_name.split()
-        for i, word in enumerate(words):
-            if word.lower() in positions and i > 0:
-                if i >= 1 and words[i - 1].lower() in ['ведущий', 'старший', 'младший', 'главный']:
-                    return f"{words[i - 1]} {word}"
-                return word
-
-        return ''
-
-    def _set_error_state(self):
-        """Устанавливает состояние ошибки для всех полей"""
-        self.result = {
-            'first_name': 'Ошибка',
-            'second_name': 'Ошибка',
-            'sur_name': 'Ошибка',
-            'department': 'Ошибка',
-            'position': 'Ошибка'
+    
+    def get_user_info(self) -> Dict[str, any]:
+        """Получает информацию о пользователе."""
+        if not self._fetch_user_data():
+            return {
+                'first_name': 'Не указано',
+                'sur_name': 'Не указано',
+                'second_name': 'Не указано',
+                'department': 'Не указано',
+                'position': 'Не указано',
+                'error': 'AD data not available'
+            }
+        
+        basic_info = self._extract_basic_info()
+        middle_name = self._extract_middle_name()
+        department = self._extract_department()
+        position = self._extract_position()
+        
+        return {
+            'first_name': basic_info['first_name'] or 'Не указано',
+            'sur_name': basic_info['sur_name'] or 'Не указано',
+            'second_name': middle_name or 'Не указано',
+            'department': department or 'Общий отдел',
+            'position': position or '',
+            'display_name': basic_info.get('display_name', '')
         }
 
 
-def get_user_info_by_login(login: str) -> dict:
+def get_user_info_by_login(login: str) -> Dict[str, any]:
     """
-    Функция-обертка для удобного использования класса
-
+    Получить информацию о пользователе из Active Directory по логину.
+    
     Args:
         login: Логин пользователя
-
+        
     Returns:
-        dict: Информация о пользователе
+        Словарь с информацией о пользователе:
+        - first_name: Имя
+        - sur_name: Фамилия
+        - second_name: Отчество
+        - department: Отдел
+        - position: Должность
+        - display_name: Отображаемое имя
     """
-    user_info = ADUserInfo(login)
-    return user_info.get_user_info()
-
+    ad_user = ADUserInfo(login)
+    return ad_user.get_user_info()

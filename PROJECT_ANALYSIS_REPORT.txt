@@ -1,0 +1,204 @@
+================================================================================
+ПОЛНЫЙ АНАЛИЗ ПРОЕКТА
+================================================================================
+
+Корневая директория: C:\Users\Пользователь\Desktop\Learning Site Final\site
+
+--------------------------------------------------------------------------------
+ОБЩАЯ СТАТИСТИКА
+--------------------------------------------------------------------------------
+Всего файлов: 114
+Всего строк кода: 17,912
+Найдено ошибок: 0
+
+--------------------------------------------------------------------------------
+СТАТИСТИКА ПО ЯЗЫКАМ ПРОГРАММИРОВАНИЯ
+--------------------------------------------------------------------------------
+
+PYTHON:
+  Файлов: 19
+  Строк кода: 3,914
+  Ошибок: 0
+
+HTML:
+  Файлов: 20
+  Строк кода: 2,395
+  Ошибок: 0
+
+CSS:
+  Файлов: 46
+  Строк кода: 8,427
+  Ошибок: 0
+
+OTHER:
+  Файлов: 29
+  Строк кода: 3,176
+  Ошибок: 0
+
+================================================================================
+ДЕТАЛЬНАЯ ИНФОРМАЦИЯ ПО ФАЙЛАМ
+================================================================================
+
+PYTHON ФАЙЛЫ:
+--------------------------------------------------------------------------------
+  backend\api.py                                                  671 строк
+  backend\models.py                                               658 строк
+  backend\ad_user_info.py                                         420 строк
+  backend\real_kerberos_auth.py                                   381 строк
+  full_project_analysis.py                                        337 строк
+  backend\routes.py                                               326 строк
+  backend\simplified_real_kerberos_auth.py                        316 строк
+  simple_init_kerberos_db.py                                      152 строк
+  test_role_system.py                                             119 строк
+  backend\config.py                                               103 строк
+  backend\migrate_add_user_fields.py                               85 строк
+  test_database.py                                                 83 строк
+  check_my_username.py                                             66 строк
+  test_auth.py                                                     60 строк
+  backend\__init__.py                                              48 строк
+  backend\utils\logging_config.py                                  45 строк
+  backend\errors.py                                                25 строк
+  backend\wsgi.py                                                  11 строк
+  run.py                                                            8 строк
+
+HTML ФАЙЛЫ:
+--------------------------------------------------------------------------------
+  admin-pages\users-info-pg\index.html                            386 строк
+  user-pages\users-info-pg\index.html                             385 строк
+  admin-pages\all-courses-pg\index.html                           219 строк
+  user-pages\all-courses-pg\index.html                            219 строк
+  admin-pages\questions-pg\index.html                             144 строк
+  user-pages\all-lessons-pg\index.html                            140 строк
+  admin-pages\all-categories-pg\index.html                        123 строк
+  user-pages\all-categories-pg\index.html                         122 строк
+  user-pages\questions-pg\index.html                              110 строк
+  user-pages\lessons-content-pg\index.html                         82 строк
+  admin-pages\lessons-content-pg\index.html                        81 строк
+  admin-pages\main-pg\index.html                                   73 строк
+  user-pages\main-pg\index.html                                    73 строк
+  admin-pages\templates\partials\full_test.html                    55 строк
+  user-pages\templates\partials\full_test.html                     54 строк
+  admin-pages\templates\partials\header.html                       34 строк
+  user-pages\templates\partials\header.html                        33 строк
+  admin-pages\all-lessons-pg\index.html                            29 строк
+  admin-pages\templates\partials\footer.html                       17 строк
+  user-pages\templates\partials\footer.html                        16 строк
+
+CSS ФАЙЛЫ:
+--------------------------------------------------------------------------------
+  admin-pages\templates\css\header-footer.css                     494 строк
+  user-pages\templates\css\header-footer.css                      494 строк
+  admin-pages\users-info-pg\style.css                             493 строк
+  user-pages\users-info-pg\style.css                              493 строк
+  admin-pages\questions-pg\style.css                              388 строк
+  user-pages\questions-pg\style.css                               388 строк
+  admin-pages\lessons-content-pg\style.css                        332 строк
+  user-pages\lessons-content-pg\style.css                         332 строк
+  admin-pages\all-categories-pg\style.css                         285 строк
+  user-pages\all-categories-pg\style.css                          285 строк
+  admin-pages\all-courses-pg\style.css                            253 строк
+  user-pages\all-courses-pg\style.css                             253 строк
+  user-pages\main-pg\style.css                                    207 строк
+  admin-pages\main-pg\style.css                                   206 строк
+  admin-pages\all-lessons-pg\style.css                            143 строк
+  user-pages\all-lessons-pg\style.css                             143 строк
+  admin-pages\lessons-content-pg\globals.css                      136 строк
+  user-pages\lessons-content-pg\globals.css                       136 строк
+  admin-pages\all-categories-pg\globals.css                       135 строк
+  admin-pages\all-courses-pg\globals.css                          135 строк
+  admin-pages\all-lessons-pg\globals.css                          135 строк
+  admin-pages\questions-pg\globals.css                            135 строк
+  user-pages\all-categories-pg\globals.css                        135 строк
+  user-pages\all-courses-pg\globals.css                           135 строк
+  user-pages\all-lessons-pg\globals.css                           135 строк
+  user-pages\questions-pg\globals.css                             135 строк
+  admin-pages\all-categories-pg\styleguide.css                    133 строк
+  admin-pages\all-courses-pg\styleguide.css                       133 строк
+  admin-pages\all-lessons-pg\styleguide.css                       133 строк
+  admin-pages\lessons-content-pg\styleguide.css                   133 строк
+  admin-pages\questions-pg\styleguide.css                         133 строк
+  user-pages\all-categories-pg\styleguide.css                     133 строк
+  user-pages\all-courses-pg\styleguide.css                        133 строк
+  user-pages\all-lessons-pg\styleguide.css                        133 строк
+  user-pages\lessons-content-pg\styleguide.css                    133 строк
+  user-pages\questions-pg\styleguide.css                          133 строк
+  admin-pages\main-pg\styleguide.css                              106 строк
+  admin-pages\users-info-pg\styleguide.css                        106 строк
+  user-pages\main-pg\styleguide.css                               106 строк
+  user-pages\users-info-pg\styleguide.css                         106 строк
+  admin-pages\main-pg\globals.css                                  35 строк
+  user-pages\main-pg\globals.css                                   35 строк
+  admin-pages\users-info-pg\globals.css                            22 строк
+  user-pages\users-info-pg\globals.css                             22 строк
+  admin-pages\templates\css\override-fonts.css                      9 строк
+  user-pages\templates\css\override-fonts.css                       9 строк
+
+OTHER ФАЙЛЫ:
+--------------------------------------------------------------------------------
+  doc's & md's\MAC_AUTH_DOCUMENTATION.md                          264 строк
+  doc's & md's\DATABASE_DOCUMENTATION.md                          262 строк
+  AUTONOMOUS_DEBUG_REPORT.md                                      259 строк
+  doc's & md's\ROUTING_SYSTEM_DOCUMENTATION.md                    226 строк
+  AUTO_REGISTRATION_DOCUMENTATION.md                              216 строк
+  doc's & md's\KERBEROS_AUTH_DOCUMENTATION.md                     176 строк
+  doc's & md's\ROLE_SYSTEM_GUIDE.md                               176 строк
+  doc's & md's\ROLE_SYSTEM_DOCUMENTATION.md                       175 строк
+  doc's & md's\tasks_tracker.md                                   172 строк
+  doc's & md's\WINDOWS_AUTH_SETUP.md                              168 строк
+  doc's & md's\CODE_CHECK_REPORT.md                               141 строк
+  COMPATIBILITY_CHECK_REPORT.md                                   132 строк
+  doc's & md's\REAL_KERBEROS_DOCUMENTATION.md                     110 строк
+  CLEANUP_REPORT.md                                               109 строк
+  README.md                                                       104 строк
+  admin-pages\main-pg\css-blocks-cheatsheet.md                     85 строк
+  user-pages\main-pg\css-blocks-cheatsheet.md                      85 строк
+  doc's & md's\QUICK_START.md                                      75 строк
+  ROLE_FIELD_ADDED.md                                              73 строк
+  setup_kerberos.bat                                               33 строк
+  docker-compose.yml                                               30 строк
+  setup_kerberos.sh                                                28 строк
+  kerberos\conf\krb5.conf                                          26 строк
+  krb5.conf                                                        26 строк
+  kerberos\conf\kdc.conf                                           18 строк
+  requirements.txt                                                  7 строк
+  admin-pages\main-pg\css-cheatsheet.md                             0 строк
+  doc's & md's\GEMINI.md                                            0 строк
+  user-pages\main-pg\css-cheatsheet.md                              0 строк
+
+================================================================================
+СТРУКТУРА ПРОЕКТА
+================================================================================
+📁 admin-pages/ (0 файлов)
+📁 admin-pages\all-categories-pg/ (4 файлов)
+📁 admin-pages\all-courses-pg/ (5 файлов)
+📁 admin-pages\all-lessons-pg/ (4 файлов)
+📁 admin-pages\lessons-content-pg/ (4 файлов)
+📁 admin-pages\main-pg/ (6 файлов)
+📁 admin-pages\questions-pg/ (4 файлов)
+📁 admin-pages\templates/ (0 файлов)
+📁 admin-pages\templates\css/ (2 файлов)
+📁 admin-pages\templates\partials/ (3 файлов)
+📁 admin-pages\users-info-pg/ (5 файлов)
+📁 backend/ (12 файлов)
+📁 backend\logs/ (1 файлов)
+📁 backend\utils/ (1 файлов)
+📁 doc's & md's/ (12 файлов)
+📁 docker image/ (1 файлов)
+📁 kerberos/ (0 файлов)
+📁 kerberos\conf/ (2 файлов)
+📁 kerberos\keytabs/ (1 файлов)
+📁 user-pages/ (0 файлов)
+📁 user-pages\all-categories-pg/ (4 файлов)
+📁 user-pages\all-courses-pg/ (5 файлов)
+📁 user-pages\all-lessons-pg/ (4 файлов)
+📁 user-pages\lessons-content-pg/ (4 файлов)
+📁 user-pages\main-pg/ (6 файлов)
+📁 user-pages\questions-pg/ (4 файлов)
+📁 user-pages\templates/ (0 файлов)
+📁 user-pages\templates\css/ (2 файлов)
+📁 user-pages\templates\partials/ (3 файлов)
+📁 user-pages\users-info-pg/ (5 файлов)
+
+================================================================================
+АНАЛИЗ ЗАВЕРШЕН
+================================================================================

@@ -27,6 +27,7 @@ class User(Base):
     department = Column(String(100), nullable=False)
     position = Column(String(100), nullable=True)  # Должность
     email = Column(String(200), unique=True, nullable=True)
+    role = Column(String(20), nullable=False, default='user')  # Роль пользователя
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
@@ -52,6 +53,7 @@ class User(Base):
             'department': self.department,
             'position': self.position or '',
             'email': self.email,
+            'role': self.role,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
@@ -355,99 +357,105 @@ class DatabaseManager:
             'question_attachments': {'question_id', 'stored_filename', 'original_filename'},
             'answer_attachments': {'answer_id', 'stored_filename', 'original_filename'},
         }
+        # Белый список допустимых имен таблиц для безопасности
+        allowed_tables = set(required.keys())
         with self.engine.begin() as conn:
             for table, cols in required.items():
+                # Дополнительная проверка безопасности
+                if table not in allowed_tables:
+                    continue
                 try:
-                    info = conn.execute(text(f"PRAGMA table_info('{table}')")).fetchall()
+                    # Используем параметризованный запрос где возможно
+                    info = conn.execute(text(f"PRAGMA table_info({table!r})")).fetchall()
                     if not info:
                         continue  # таблицы нет — create_all создаст
                     existing = {row[1] for row in info}  # row[1] = name
                     if not cols.issubset(existing):
-                        conn.execute(text(f"DROP TABLE IF EXISTS {table}"))
+                        conn.execute(text(f"DROP TABLE IF EXISTS {table!r}"))
                 except Exception:
                     # при любой ошибке пересоздаём таблицу
                     try:
-                        conn.execute(text(f"DROP TABLE IF EXISTS {table}"))
+                        conn.execute(text(f"DROP TABLE IF EXISTS {table!r}"))
                     except Exception:
                         pass
+
+    def _migrate_user_fields(self):
+        """Добавляет новые поля в таблицы users и kerberos_users если их нет."""
+        with self.engine.begin() as conn:
+            try:
+                # Миграция таблицы users
+                users_columns = conn.execute(text("PRAGMA table_info('users')")).fetchall()
+                if users_columns:
+                    existing_users_columns = {col[1] for col in users_columns}
+                    
+                    if 'surname' not in existing_users_columns:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN surname VARCHAR(100)"))
+                    
+                    if 'fst_name' not in existing_users_columns:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN fst_name VARCHAR(100)"))
+                    
+                    if 'sec_name' not in existing_users_columns:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN sec_name VARCHAR(100)"))
+                    
+                    if 'position' not in existing_users_columns:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN position VARCHAR(100)"))
+                    
+                    if 'role' not in existing_users_columns:
+                        conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR(20) DEFAULT 'user'"))
+                
+                # Миграция таблицы kerberos_users
+                kerberos_columns = conn.execute(text("PRAGMA table_info('kerberos_users')")).fetchall()
+                if kerberos_columns:
+                    existing_kerberos_columns = {col[1] for col in kerberos_columns}
+                    
+                    if 'surname' not in existing_kerberos_columns:
+                        conn.execute(text("ALTER TABLE kerberos_users ADD COLUMN surname VARCHAR(100)"))
+                    
+                    if 'fst_name' not in existing_kerberos_columns:
+                        conn.execute(text("ALTER TABLE kerberos_users ADD COLUMN fst_name VARCHAR(100)"))
+                    
+                    if 'sec_name' not in existing_kerberos_columns:
+                        conn.execute(text("ALTER TABLE kerberos_users ADD COLUMN sec_name VARCHAR(100)"))
+                    
+                    if 'position' not in existing_kerberos_columns:
+                        conn.execute(text("ALTER TABLE kerberos_users ADD COLUMN position VARCHAR(100)"))
+                    
+                    if 'role' not in existing_kerberos_columns:
+                        conn.execute(text("ALTER TABLE kerberos_users ADD COLUMN role VARCHAR(20) DEFAULT 'user'"))
+            except Exception as e:
+                # Если таблицы еще не существуют, это нормально - они будут созданы через create_all
+                pass
 
     def create_tables(self):
         """Создать все таблицы, предварительно проверив схему Q&A."""
         self._ensure_qa_schema()
         Base.metadata.create_all(bind=self.engine)
+        # Выполняем миграцию новых полей после создания таблиц
+        self._migrate_user_fields()
 
     def cleanup_legacy_and_kerberos(self):
-        """Удалить устаревшие таблицы (например, mac_users) и очистить kerberos_users."""
+        """Удалить устаревшие таблицы (например, mac_users)."""
         with self.engine.begin() as conn:
             try:
                 # Удаляем таблицу mac_users, если она существует
                 conn.execute(text("DROP TABLE IF EXISTS mac_users"))
             except Exception:
                 pass
-            try:
-                # Очищаем таблицу kerberos_users
-                conn.execute(text("DELETE FROM kerberos_users"))
-                # Сбрасывать AUTOINCREMENT у SQLite не обязательно, но можно
-                conn.execute(text("DELETE FROM sqlite_sequence WHERE name='kerberos_users'"))
-            except Exception:
-                pass
+            # НЕ очищаем kerberos_users - там хранятся реальные пользователи!
     
     def get_session(self):
         """Получить сессию базы данных."""
         return self.SessionLocal()
     
     def init_sample_data(self):
-        """Инициализировать тестовые данные."""
+        """Инициализировать тестовые данные (только курсы и уроки, без пользователей)."""
         session = self.get_session()
         
         try:
             # Идёмпотентное наполнение: создаём только отсутствующие сущности
-            
-            # Создаем тестовых пользователей
-            users_data = [
-                {
-                    'username': 'ivan.petrov',
-                    'full_name': 'Иван Петров',
-                    'department': 'IT отдел',
-                    'email': 'ivan.petrov@company.com'
-                },
-                {
-                    'username': 'maria.sidorova',
-                    'full_name': 'Мария Сидорова',
-                    'department': 'HR отдел',
-                    'email': 'maria.sidorova@company.com'
-                },
-                {
-                    'username': 'alex.kuznetsov',
-                    'full_name': 'Алексей Кузнецов',
-                    'department': 'Финансовый отдел',
-                    'email': 'alex.kuznetsov@company.com'
-                },
-                {
-                    'username': 'elena.volkova',
-                    'full_name': 'Елена Волкова',
-                    'department': 'Маркетинг',
-                    'email': 'elena.volkova@company.com'
-                }
-            ]
+            # Пользователи создаются автоматически при входе через аутентификацию
             
             users = []
-            for user_data in users_data:
-                existing = session.query(User).filter(User.username == user_data['username'].lower()).first()
-                if existing:
-                    users.append(existing)
-                else:
-                    user = User(
-                        username=user_data['username'].lower(),
-                        full_name=user_data['full_name'],
-                        department=user_data['department'],
-                        email=user_data.get('email'),
-                        is_active=True
-                    )
-                    session.add(user)
-                    session.flush()
-                    users.append(user)
-            session.commit()
             
             # Создаем тестовые курсы
             courses_data = [
@@ -554,7 +562,7 @@ class DatabaseManager:
                     ))
             
             session.commit()
-            print("✅ Тестовые данные успешно созданы!")
+            print("OK: Data Base initialized successfully!")
 
             # Создаем тестовые вопросы и ответы
             from random import choice

@@ -543,8 +543,13 @@ def register_user():
         new_user = User(
             username=username.lower(),
             full_name=data.get('full_name', username),
+            surname=data.get('surname', ''),
+            fst_name=data.get('fst_name', ''),
+            sec_name=data.get('sec_name', ''),
             department=data.get('department', 'Общий отдел'),
+            position=data.get('position', ''),
             email=data.get('email', f"{username.lower()}@company.com"),
+            role=data.get('role', 'user'),
             is_active=True
         )
         session.add(new_user)
@@ -653,7 +658,7 @@ def init_api(app):
     # Инициализируем базу данных
     db_manager.create_tables()
 
-    # Очищаем устаревшие/лишние таблицы и записи (mac_users, kerberos_users)
+    # Очищаем только устаревшие таблицы (mac_users), НЕ трогаем kerberos_users и users
     try:
         db_manager.cleanup_legacy_and_kerberos()
     except Exception:

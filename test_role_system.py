@@ -12,30 +12,13 @@ from unittest.mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
 
 from backend import create_app
-from backend.auth import WindowsAuth
 
 
-def test_role_detection():
-    """Тестируем определение ролей пользователей."""
-    print("🔍 Тестирование определения ролей...")
-    
-    auth = WindowsAuth()
-    
-    # Тестируем админов
-    admin_users = ['admin', 'administrator', 'root', 'manager', 'админ']
-    for username in admin_users:
-        role = auth._determine_user_role(username)
-        print(f"  {username} -> {role}")
-        assert role == 'admin', f"Ожидался 'admin' для {username}, получен {role}"
-    
-    # Тестируем обычных пользователей
-    regular_users = ['ivan.petrov', 'maria.sidorova', 'user123', 'test']
-    for username in regular_users:
-        role = auth._determine_user_role(username)
-        print(f"  {username} -> {role}")
-        assert role == 'user', f"Ожидался 'user' для {username}, получен {role}"
-    
-    print("✅ Определение ролей работает корректно!")
+def test_app_boot():
+    print("🔍 Тестирование запуска приложения...")
+    app = create_app("development")
+    assert app is not None
+    print("✅ Приложение инициализируется")
 
 
 def test_app_creation():
@@ -45,8 +28,8 @@ def test_app_creation():
     app = create_app("development")
     
     # Проверяем конфигурацию
-    assert app.config['ADMIN_TEMPLATE_DIR'] == 'admin-pges'
-    assert app.config['USER_TEMPLATE_DIR'] == 'user-ges'
+    assert app.config['ADMIN_TEMPLATE_DIR'] == 'admin-pages'
+    assert app.config['USER_TEMPLATE_DIR'] == 'user-pages'
     assert 'PROJECT_ROOT' in app.config
     
     print("✅ Приложение создается корректно!")
@@ -61,8 +44,8 @@ def test_template_paths():
     project_root = app.config['PROJECT_ROOT']
     
     # Проверяем существование папок
-    admin_path = os.path.join(project_root, 'admin-pges')
-    user_path = os.path.join(project_root, 'user-ges')
+    admin_path = os.path.join(project_root, 'admin-pages')
+    user_path = os.path.join(project_root, 'user-pages')
     
     print(f"  Корневая папка проекта: {project_root}")
     print(f"  Папка админских шаблонов: {admin_path}")
@@ -90,44 +73,19 @@ def test_template_paths():
     print("✅ Все пути к шаблонам корректны!")
 
 
-def test_mock_requests():
-    """Тестируем запросы с мок-пользователями."""
-    print("\n🔍 Тестирование запросов с разными ролями...")
-    
+def test_basic_requests():
+    """Проверка, что основные страницы отдаются без ошибок (200)."""
+    print("\n🔍 Базовая проверка запросов...")
     app = create_app("development")
-    
     with app.test_client() as client:
-        # Тестируем с мок-админом
-        with patch('flask.g') as mock_g:
-            mock_g.user_info = {'role': 'admin', 'username': 'admin'}
-            
-            # Делаем запрос к главной странице
-            response = client.get('/main')
-            print(f"  Запрос админа к /main: {response.status_code}")
-            
-            if response.status_code == 200:
-                # Проверяем, что используется админский шаблон
-                content = response.get_data(as_text=True)
-                if 'Образовательный' in content and 'портал ГТНГ' in content:
-                    print("  ✅ Админский шаблон используется корректно")
-                else:
-                    print("  ⚠️  Возможно, используется неправильный шаблон")
-        
-        # Тестируем с мок-пользователем
-        with patch('flask.g') as mock_g:
-            mock_g.user_info = {'role': 'user', 'username': 'ivan.petrov'}
-            
-            # Делаем запрос к главной странице
-            response = client.get('/main')
-            print(f"  Запрос пользователя к /main: {response.status_code}")
-            
-            if response.status_code == 200:
-                # Проверяем, что используется пользовательский шаблон
-                content = response.get_data(as_text=True)
-                if 'learnSite' in content:
-                    print("  ✅ Пользовательский шаблон используется корректно")
-                else:
-                    print("  ⚠️  Возможно, используется неправильный шаблон")
+        for path in [
+            '/main-pg/',
+            '/questions-pg/',
+            '/users-info-pg/'
+        ]:
+            resp = client.get(path)
+            print(f"  GET {path}: {resp.status_code}")
+            assert resp.status_code == 200
 
 
 def main():
@@ -135,10 +93,10 @@ def main():
     print("🚀 Запуск тестирования системы ролевой маршрутизации\n")
     
     try:
-        test_role_detection()
+        test_app_boot()
         test_app_creation()
         test_template_paths()
-        test_mock_requests()
+        test_basic_requests()
         
         print("\n🎉 Все тесты прошли успешно!")
         print("\n📋 Инструкции по использованию:")

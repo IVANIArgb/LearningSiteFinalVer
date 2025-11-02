@@ -47,13 +47,20 @@ class BaseConfig:
     LOG_FILE = os.path.join(LOG_DIR, "app.log")
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     
-    # Kerberos Authentication settings (ONLY)
+    # Kerberos Authentication settings (REAL)
     KERBEROS_AUTH_ENABLED = os.environ.get("KERBEROS_AUTH_ENABLED", "true").lower() == "true"
     KERBEROS_SERVICE_NAME = os.environ.get("KERBEROS_SERVICE_NAME", "HTTP")
     KERBEROS_REALM = os.environ.get("KERBEROS_REALM", "EXAMPLE.COM")
     KERBEROS_KEYTAB = os.environ.get("KERBEROS_KEYTAB", "/etc/krb5.keytab")
     KERBEROS_KDC_HOST = os.environ.get("KERBEROS_KDC_HOST", "localhost")
     KERBEROS_KDC_PORT = int(os.environ.get("KERBEROS_KDC_PORT", "88"))
+
+    # LDAP/AD enrichment
+    LDAP_ENABLED = os.environ.get("LDAP_ENABLED", "true").lower() == "true"
+    LDAP_SERVER = os.environ.get("LDAP_SERVER", "ldap://dc1.example.com")
+    LDAP_USER = os.environ.get("LDAP_USER", "")  # e.g. user@example.com
+    LDAP_PASSWORD = os.environ.get("LDAP_PASSWORD", "")
+    LDAP_BASE_DN = os.environ.get("LDAP_BASE_DN", "DC=example,DC=com")
     
     # Database settings
     # БД размещается в папке backend

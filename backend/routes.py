@@ -176,7 +176,7 @@ def register_routes(app: Flask) -> None:
                     payload['department'] = ku.department or payload.get('department', '')
                     payload['position'] = ku.position or payload.get('position', '')
                     payload['full_name'] = ku._get_full_name_from_parts() or ku.full_name or payload.get('full_name', '')
-                    payload['role'] = ku.role
+                    payload['role'] = ku.role or payload.get('role', 'user')
                     payload['email'] = ku.email or ''
                     payload['last_login'] = ku.last_login.isoformat() if ku.last_login else None
                 else:
@@ -189,6 +189,7 @@ def register_routes(app: Flask) -> None:
                         payload['department'] = user.department or payload.get('department', '')
                         payload['position'] = user.position or payload.get('position', '')
                         payload['full_name'] = user._get_full_name_from_parts() or user.full_name or payload.get('full_name', '')
+                        payload['role'] = user.role or payload.get('role', 'user')
                         payload['email'] = user.email or ''
             finally:
                 session.close()

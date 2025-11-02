@@ -170,6 +170,7 @@ class SimplifiedRealKerberosAuth:
     
     def _determine_user_role(self, username: str) -> str:
         """Определение роли пользователя из БД"""
+        session = None
         try:
             from .models import db_manager, KerberosUser
             
@@ -196,10 +197,16 @@ class SimplifiedRealKerberosAuth:
                 return 'user'
                 
             finally:
-                session.close()
+                if session:
+                    session.close()
                 
         except Exception as e:
             self.logger.error(f"Ошибка определения роли для {username}: {e}")
+            if session:
+                try:
+                    session.close()
+                except Exception:
+                    pass
             # Fallback к хардкоду
             admin_users = [
                 'admin', 'administrator', 'root', 'manager',
@@ -223,6 +230,7 @@ class SimplifiedRealKerberosAuth:
     
     def _auto_register_user(self, username: str):
         """Автоматическая регистрация пользователя в БД"""
+        session = None
         try:
             from .models import db_manager, User, KerberosUser
             
@@ -238,6 +246,7 @@ class SimplifiedRealKerberosAuth:
                         full_name=username,
                         department=self._get_user_department(username),
                         email=f"{username.lower()}@company.com",
+                        role='user',
                         is_active=True
                     )
                     session.add(new_user)
@@ -260,6 +269,9 @@ class SimplifiedRealKerberosAuth:
                         principal=f"{username.lower()}@{realm}",
                         realm=realm,
                         full_name=username,
+                        surname='',
+                        fst_name='',
+                        sec_name='',
                         department=self._get_user_department(username),
                         email=f"{username.lower()}@company.com",
                         role='user',
@@ -273,14 +285,21 @@ class SimplifiedRealKerberosAuth:
                 session.commit()
                 
             except Exception as e:
-                session.rollback()
+                if session:
+                    session.rollback()
                 self.logger.error(f"❌ Ошибка при регистрации пользователя {username}: {e}")
                 raise
             finally:
-                session.close()
+                if session:
+                    session.close()
                 
         except Exception as e:
             self.logger.error(f"❌ Критическая ошибка при регистрации пользователя {username}: {e}")
+            if session:
+                try:
+                    session.close()
+                except Exception:
+                    pass
     
     def _get_user_department(self, username: str) -> str:
         """Определение отдела пользователя на основе имени"""
