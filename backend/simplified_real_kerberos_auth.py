@@ -171,19 +171,15 @@ class SimplifiedRealKerberosAuth:
     def _determine_user_role(self, username: str) -> str:
         """Определение роли пользователя из БД"""
         try:
-            from .models import db_manager, KerberosUser
+            from .models import db_manager, User
             
             session = db_manager.get_session()
             try:
-                # Ищем пользователя в БД
-                kerberos_user = session.query(KerberosUser).filter(
-                    KerberosUser.username == username.lower()
-                ).first()
+                user = session.query(User).filter(User.username == username.lower()).first()
                 
-                if kerberos_user:
-                    return kerberos_user.role
+                if user and user.role:
+                    return user.role
                 
-                # Если пользователь не найден в БД, используем хардкод
                 admin_users = [
                     'admin', 'administrator', 'root', 'manager',
                     'админ', 'администратор', 'руководитель',
@@ -200,7 +196,6 @@ class SimplifiedRealKerberosAuth:
                 
         except Exception as e:
             self.logger.error(f"Ошибка определения роли для {username}: {e}")
-            # Fallback к хардкоду
             admin_users = [
                 'admin', 'administrator', 'root', 'manager',
                 'админ', 'администратор', 'руководитель',
@@ -224,51 +219,25 @@ class SimplifiedRealKerberosAuth:
     def _auto_register_user(self, username: str):
         """Автоматическая регистрация пользователя в БД"""
         try:
-            from .models import db_manager, User, KerberosUser
+            from .models import db_manager, User
             
             session = db_manager.get_session()
             try:
-                # Проверяем, существует ли пользователь в основной таблице User
                 existing_user = session.query(User).filter(User.username == username.lower()).first()
                 
                 if not existing_user:
-                    # Создаем нового пользователя как обычного user
                     new_user = User(
                         username=username.lower(),
-                        full_name=username,
-                        department=self._get_user_department(username),
-                        email=f"{username.lower()}@company.com",
-                        is_active=True
-                    )
-                    session.add(new_user)
-                    self.logger.info(f"✅ Новый пользователь зарегистрирован: {username}")
-                else:
-                    self.logger.info(f"ℹ️  Пользователь уже существует: {username}")
-                
-                # Проверяем, существует ли пользователь в таблице KerberosUser
-                existing_kerberos_user = session.query(KerberosUser).filter(
-                    KerberosUser.username == username.lower()
-                ).first()
-                
-                if not existing_kerberos_user:
-                    # Получаем realm из конфигурации
-                    realm = getattr(self, 'realm', 'EXAMPLE.COM')
-                    
-                    # Создаем Kerberos запись для пользователя; роль по умолчанию user
-                    kerberos_user = KerberosUser(
-                        username=username.lower(),
-                        principal=f"{username.lower()}@{realm}",
-                        realm=realm,
                         full_name=username,
                         department=self._get_user_department(username),
                         email=f"{username.lower()}@company.com",
                         role='user',
                         is_active=True
                     )
-                    session.add(kerberos_user)
-                    self.logger.info(f"✅ Kerberos пользователь зарегистрирован: {username}")
+                    session.add(new_user)
+                    self.logger.info(f"✅ Новый пользователь зарегистрирован: {username}")
                 else:
-                    self.logger.info(f"ℹ️  Kerberos пользователь уже существует: {username}")
+                    self.logger.info(f"ℹ️  Пользователь уже существует: {username}")
                 
                 session.commit()
                 

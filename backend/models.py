@@ -24,10 +24,14 @@ class User(Base):
     surname = Column(String(100), nullable=True)  # Фамилия
     fst_name = Column(String(100), nullable=True)  # Имя
     sec_name = Column(String(100), nullable=True)  # Отчество
+    principal = Column(String(200), unique=True, nullable=True, index=True)
+    realm = Column(String(100), nullable=True, index=True)
     department = Column(String(100), nullable=False)
     position = Column(String(100), nullable=True)  # Должность
     email = Column(String(200), unique=True, nullable=True)
+    role = Column(String(20), nullable=False, default='user')
     is_active = Column(Boolean, default=True)
+    last_login = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
@@ -49,10 +53,14 @@ class User(Base):
             'surname': self.surname or '',
             'fst_name': self.fst_name or '',
             'sec_name': self.sec_name or '',
+            'principal': self.principal or '',
+            'realm': self.realm or '',
             'department': self.department,
             'position': self.position or '',
             'email': self.email,
             'is_active': self.is_active,
+            'role': self.role,
+            'last_login': self.last_login.isoformat() if self.last_login else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'courses_completed': len([cp for cp in self.course_progress if cp.is_completed]),
@@ -374,82 +382,102 @@ class DatabaseManager:
     def create_tables(self):
         """Создать все таблицы, предварительно проверив схему Q&A."""
         self._ensure_qa_schema()
+        self._ensure_user_columns()
         Base.metadata.create_all(bind=self.engine)
+        self._merge_kerberos_users()
 
     def cleanup_legacy_and_kerberos(self):
-        """Удалить устаревшие таблицы (например, mac_users) и очистить kerberos_users."""
+        """Удалить устаревшие таблицы (например, mac_users)."""
         with self.engine.begin() as conn:
             try:
                 # Удаляем таблицу mac_users, если она существует
                 conn.execute(text("DROP TABLE IF EXISTS mac_users"))
             except Exception:
                 pass
-            try:
-                # Очищаем таблицу kerberos_users
-                conn.execute(text("DELETE FROM kerberos_users"))
-                # Сбрасывать AUTOINCREMENT у SQLite не обязательно, но можно
-                conn.execute(text("DELETE FROM sqlite_sequence WHERE name='kerberos_users'"))
-            except Exception:
-                pass
     
     def get_session(self):
         """Получить сессию базы данных."""
         return self.SessionLocal()
+
+    def _ensure_user_columns(self):
+        """Добавить недостающие колонки в таблицу users."""
+        with self.engine.begin() as conn:
+            try:
+                info = conn.execute(text("PRAGMA table_info('users')")).fetchall()
+                if not info:
+                    return
+                existing = {row[1] for row in info}
+                additions = []
+                if 'role' not in existing:
+                    additions.append("ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user'")
+                if 'principal' not in existing:
+                    additions.append("ADD COLUMN principal VARCHAR(200)")
+                if 'realm' not in existing:
+                    additions.append("ADD COLUMN realm VARCHAR(100)")
+                if 'last_login' not in existing:
+                    additions.append("ADD COLUMN last_login DATETIME")
+                for clause in additions:
+                    conn.execute(text(f"ALTER TABLE users {clause}"))
+            except Exception:
+                pass
+
+    def _merge_kerberos_users(self):
+        """Перенести данные из legacy-таблицы kerberos_users в users и удалить её."""
+        with self.engine.begin() as conn:
+            legacy_exists = conn.execute(
+                text("SELECT name FROM sqlite_master WHERE type='table' AND name='kerberos_users'")
+            ).fetchone()
+        if not legacy_exists:
+            return
+
+        session = self.get_session()
+        try:
+            rows = session.execute(text("""
+                SELECT username, principal, realm, full_name, surname, fst_name, sec_name,
+                       department, position, email, role, is_active, last_login
+                FROM kerberos_users
+            """)).mappings().all()
+
+            for row in rows:
+                username = (row.get('username') or '').lower()
+                if not username:
+                    continue
+                user = session.query(User).filter(User.username == username).first()
+                if not user:
+                    user = User(username=username)
+                    session.add(user)
+
+                # Обновляем данными из legacy-таблицы, не затирая актуальные значения
+                user.principal = row.get('principal') or user.principal
+                user.realm = row.get('realm') or user.realm
+                user.full_name = row.get('full_name') or user.full_name
+                user.surname = row.get('surname') or user.surname
+                user.fst_name = row.get('fst_name') or user.fst_name
+                user.sec_name = row.get('sec_name') or user.sec_name
+                user.department = row.get('department') or user.department or 'Общий отдел'
+                user.position = row.get('position') or user.position
+                user.email = row.get('email') or user.email
+                user.role = row.get('role') or user.role or 'user'
+                if row.get('is_active') is not None:
+                    user.is_active = row.get('is_active')
+                user.last_login = row.get('last_login') or user.last_login
+
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
+        with self.engine.begin() as conn:
+            conn.execute(text("DROP TABLE IF EXISTS kerberos_users"))
     
     def init_sample_data(self):
-        """Инициализировать тестовые данные."""
+        """Инициализировать базовые учебные данные без создания тестовых пользователей."""
         session = self.get_session()
         
         try:
-            # Идёмпотентное наполнение: создаём только отсутствующие сущности
-            
-            # Создаем тестовых пользователей
-            users_data = [
-                {
-                    'username': 'ivan.petrov',
-                    'full_name': 'Иван Петров',
-                    'department': 'IT отдел',
-                    'email': 'ivan.petrov@company.com'
-                },
-                {
-                    'username': 'maria.sidorova',
-                    'full_name': 'Мария Сидорова',
-                    'department': 'HR отдел',
-                    'email': 'maria.sidorova@company.com'
-                },
-                {
-                    'username': 'alex.kuznetsov',
-                    'full_name': 'Алексей Кузнецов',
-                    'department': 'Финансовый отдел',
-                    'email': 'alex.kuznetsov@company.com'
-                },
-                {
-                    'username': 'elena.volkova',
-                    'full_name': 'Елена Волкова',
-                    'department': 'Маркетинг',
-                    'email': 'elena.volkova@company.com'
-                }
-            ]
-            
-            users = []
-            for user_data in users_data:
-                existing = session.query(User).filter(User.username == user_data['username'].lower()).first()
-                if existing:
-                    users.append(existing)
-                else:
-                    user = User(
-                        username=user_data['username'].lower(),
-                        full_name=user_data['full_name'],
-                        department=user_data['department'],
-                        email=user_data.get('email'),
-                        is_active=True
-                    )
-                    session.add(user)
-                    session.flush()
-                    users.append(user)
-            session.commit()
-            
-            # Создаем тестовые курсы
+            # Создаем (или обновляем) только курсы и уроки, чтобы UI имел структуру.
             courses_data = [
                 {
                     'title': 'Основы информационной безопасности',
@@ -531,118 +559,13 @@ class DatabaseManager:
                     if not exists:
                         session.add(Lesson(course_id=c.id, title=title, lesson_number=num))
             session.commit()
-            
-            # Создаем прогресс пользователей
-            import random
-            
-            for user in users:
-                for course in courses:
-                    existing = session.query(UserCourseProgress).filter(
-                        UserCourseProgress.user_id == user.id,
-                        UserCourseProgress.course_id == course.id
-                    ).first()
-                    if existing:
-                        continue
-                    lessons_completed = random.randint(0, course.total_lessons)
-                    is_completed = lessons_completed == course.total_lessons
-                    session.add(UserCourseProgress(
-                        user_id=user.id,
-                        course_id=course.id,
-                        lessons_completed=lessons_completed,
-                        is_completed=is_completed,
-                        completed_at=datetime.now() if is_completed else None
-                    ))
-            
-            session.commit()
-            print("✅ Тестовые данные успешно созданы!")
-
-            # Создаем тестовые вопросы и ответы
-            from random import choice
-            # Берем существующих пользователей как авторов вопросов
-            all_users = session.query(User).all()
-            if all_users:
-                # Проверим, есть ли уже такие вопросы
-                def ensure_question(author, title, body, tags):
-                    existing_q = session.query(Question).filter(Question.title == title).first()
-                    if existing_q:
-                        return existing_q
-                    q = Question(author_id=author.id, title=title, body=body, tags=tags)
-                    session.add(q)
-                    session.flush()
-                    return q
-
-                q1 = ensure_question(all_users[0], 'Как обновить приложение?','Не получается обновить приложение до последней версии. Что делать?','Microsoft,Обновление,Word')
-                author2 = all_users[1] if len(all_users) > 1 else all_users[0]
-                q2 = ensure_question(author2, 'Где найти материалы по безопасности?','Ищу материалы из курса по ИБ.','ИБ,Материалы')
-                session.commit()
-
-                # Ответ от "админа" — в демо: первый пользователь
-                existing_a = session.query(Answer).filter(Answer.question_id == q1.id).first()
-                if not existing_a:
-                    a1 = Answer(question_id=q1.id, author_id=all_users[0].id, body='Перейдите в раздел Настройки -> Обновления и нажмите "Проверить обновления".')
-                    session.add(a1)
-                    q1.is_resolved = True
-                    session.commit()
+            print("✅ Базовые учебные данные обновлены (курсы и уроки).")
             
         except Exception as e:
             session.rollback()
-            print(f"❌ Ошибка при создании тестовых данных: {e}")
+            print(f"❌ Ошибка при обновлении учебных данных: {e}")
         finally:
             session.close()
-
-
-class KerberosUser(Base):
-    """Модель для Kerberos пользователей"""
-    __tablename__ = 'kerberos_users'
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(100), nullable=False, unique=True, index=True)
-    principal = Column(String(200), nullable=False, unique=True, index=True)  # username@REALM
-    realm = Column(String(100), nullable=False, index=True)
-    full_name = Column(String(200), nullable=True)  # Оставляем для обратной совместимости
-    surname = Column(String(100), nullable=True)  # Фамилия
-    fst_name = Column(String(100), nullable=True)  # Имя
-    sec_name = Column(String(100), nullable=True)  # Отчество
-    department = Column(String(100), nullable=True)
-    position = Column(String(100), nullable=True)  # Должность
-    email = Column(String(200), nullable=True)
-    role = Column(String(20), nullable=False, default='user')
-    is_active = Column(Boolean, default=True)
-    last_login = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    
-    def _get_full_name_from_parts(self) -> str:
-        """Собирает полное имя из частей."""
-        parts = []
-        if self.surname:
-            parts.append(self.surname)
-        if self.fst_name:
-            parts.append(self.fst_name)
-        if self.sec_name:
-            parts.append(self.sec_name)
-        return ' '.join(parts) if parts else ''
-    
-    def __repr__(self):
-        return f"<KerberosUser(username='{self.username}', principal='{self.principal}', role='{self.role}')>"
-
-
-class KerberosSession(Base):
-    """Модель для Kerberos сессий"""
-    __tablename__ = 'kerberos_sessions'
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    session_id = Column(String(255), nullable=False, unique=True, index=True)
-    username = Column(String(100), nullable=False, index=True)
-    principal = Column(String(200), nullable=False)
-    ip_address = Column(String(45), nullable=True)
-    user_agent = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=func.now())
-    expires_at = Column(DateTime, nullable=False)
-    is_active = Column(Boolean, default=True)
-    
-    def __repr__(self):
-        return f"<KerberosSession(session_id='{self.session_id}', username='{self.username}')>"
 
 
 # Глобальный экземпляр менеджера базы данных

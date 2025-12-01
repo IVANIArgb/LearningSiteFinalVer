@@ -129,7 +129,7 @@ def register_routes(app: Flask) -> None:
     @app.get("/user/info-test")
     def user_info_test():
         from flask import g
-        from .models import db_manager, User, KerberosUser
+        from .models import db_manager, User
         
         info = g.get('user_info', {}) or {}
         if not info.get('username'):
@@ -167,29 +167,17 @@ def register_routes(app: Flask) -> None:
         try:
             session = db_manager.get_session()
             try:
-                # Пробуем получить данные из KerberosUser
-                ku = session.query(KerberosUser).filter(KerberosUser.username == username.lower()).first()
-                if ku:
-                    payload['surname'] = ku.surname or payload.get('surname', '')
-                    payload['fst_name'] = ku.fst_name or payload.get('fst_name', '')
-                    payload['sec_name'] = ku.sec_name or payload.get('sec_name', '')
-                    payload['department'] = ku.department or payload.get('department', '')
-                    payload['position'] = ku.position or payload.get('position', '')
-                    payload['full_name'] = ku._get_full_name_from_parts() or ku.full_name or payload.get('full_name', '')
-                    payload['role'] = ku.role
-                    payload['email'] = ku.email or ''
-                    payload['last_login'] = ku.last_login.isoformat() if ku.last_login else None
-                else:
-                    # Если нет KerberosUser, пробуем User
-                    user = session.query(User).filter(User.username == username.lower()).first()
-                    if user:
-                        payload['surname'] = user.surname or payload.get('surname', '')
-                        payload['fst_name'] = user.fst_name or payload.get('fst_name', '')
-                        payload['sec_name'] = user.sec_name or payload.get('sec_name', '')
-                        payload['department'] = user.department or payload.get('department', '')
-                        payload['position'] = user.position or payload.get('position', '')
-                        payload['full_name'] = user._get_full_name_from_parts() or user.full_name or payload.get('full_name', '')
-                        payload['email'] = user.email or ''
+                user = session.query(User).filter(User.username == username.lower()).first()
+                if user:
+                    payload['surname'] = user.surname or payload.get('surname', '')
+                    payload['fst_name'] = user.fst_name or payload.get('fst_name', '')
+                    payload['sec_name'] = user.sec_name or payload.get('sec_name', '')
+                    payload['department'] = user.department or payload.get('department', '')
+                    payload['position'] = user.position or payload.get('position', '')
+                    payload['full_name'] = user._get_full_name_from_parts() or user.full_name or payload.get('full_name', '')
+                    payload['role'] = user.role or payload.get('role', 'user')
+                    payload['email'] = user.email or ''
+                    payload['last_login'] = user.last_login.isoformat() if user.last_login else None
             finally:
                 session.close()
         except Exception as e:
@@ -198,6 +186,29 @@ def register_routes(app: Flask) -> None:
             logging.getLogger(__name__).warning(f"Failed to get user data from DB: {e}")
         
         return jsonify(payload)
+
+    @app.get("/actions")
+    def view_actions_log():
+        from flask import g
+
+        user_info = g.get('user_info', {}) or {}
+        if user_info.get('role') != 'admin':
+            abort(403)
+
+        log_path = app.config.get("USER_ACTION_LOG")
+        entries: List[str] = []
+        if log_path and os.path.exists(log_path):
+            with open(log_path, "r", encoding="utf-8") as log_file:
+                lines = [line.strip() for line in log_file if line.strip()]
+                entries = lines[-500:]
+
+        return render_template(
+            "backend/actions_log.html",
+            entries=reversed(entries),
+            username=user_info.get('username'),
+            full_name=user_info.get('full_name'),
+            role=user_info.get('role'),
+        )
 
     # Serve uploaded files (Q&A attachments)
     @app.get("/uploads/<path:filename>")

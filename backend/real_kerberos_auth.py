@@ -134,35 +134,32 @@ class RealKerberosAuth:
             # Role resolution and user registration/update
             role = 'user'
             try:
-                from .models import db_manager, KerberosUser, User
+                from .models import db_manager, User
                 session = db_manager.get_session()
                 try:
-                    # Обновляем или создаем KerberosUser
-                    ku = session.query(KerberosUser).filter(KerberosUser.username == username.lower()).first()
-                    if ku:
-                        # Обновляем существующего пользователя
-                        if ad_info:
-                            ku.surname = ad_info.get('sur_name', '') if ad_info.get('sur_name') != 'Не указано' and ad_info.get('sur_name') != 'Ошибка' else ku.surname
-                            ku.fst_name = ad_info.get('first_name', '') if ad_info.get('first_name') != 'Не указано' and ad_info.get('first_name') != 'Ошибка' else ku.fst_name
-                            ku.sec_name = ad_info.get('second_name', '') if ad_info.get('second_name') != 'Не указано' and ad_info.get('second_name') != 'Ошибка' else ku.sec_name
-                            ku.department = ad_info.get('department', '') if ad_info.get('department') != 'Не указано' and ad_info.get('department') != 'Ошибка' else ku.department
-                            ku.position = ad_info.get('position', '') if ad_info.get('position') != 'Не указано' and ad_info.get('position') != 'Ошибка' else ku.position
-                            ku.full_name = ku._get_full_name_from_parts() if (ku.surname or ku.fst_name) else full_name
-                        ku.last_login = datetime.now()
-                        role = ku.role
+                    user = session.query(User).filter(User.username == username.lower()).first()
+                    
+                    surname = ad_info.get('sur_name', '') if ad_info and ad_info.get('sur_name') not in ['Не указано', 'Ошибка'] else ''
+                    fst_name = ad_info.get('first_name', '') if ad_info and ad_info.get('first_name') not in ['Не указано', 'Ошибка'] else ''
+                    sec_name = ad_info.get('second_name', '') if ad_info and ad_info.get('second_name') not in ['Не указано', 'Ошибка'] else ''
+                    department = ad_info.get('department', 'Общий отдел') if ad_info and ad_info.get('department') not in ['Не указано', 'Ошибка'] else 'Общий отдел'
+                    position = ad_info.get('position', '') if ad_info and ad_info.get('position') not in ['Не указано', 'Ошибка'] else ''
+                    
+                    if user:
+                        user.principal = principal or user.principal
+                        user.realm = realm or user.realm
+                        user.surname = surname or user.surname
+                        user.fst_name = fst_name or user.fst_name
+                        user.sec_name = sec_name or user.sec_name
+                        user.department = department or user.department
+                        user.position = position or user.position
+                        user.full_name = user._get_full_name_from_parts() or user.full_name or full_name
+                        user.email = user.email or f"{username.lower()}@company.com"
+                        user.last_login = datetime.now()
                     else:
-                        # Создаем нового KerberosUser
-                        surname = ad_info.get('sur_name', '') if ad_info and ad_info.get('sur_name') not in ['Не указано', 'Ошибка'] else ''
-                        fst_name = ad_info.get('first_name', '') if ad_info and ad_info.get('first_name') not in ['Не указано', 'Ошибка'] else ''
-                        sec_name = ad_info.get('second_name', '') if ad_info and ad_info.get('second_name') not in ['Не указано', 'Ошибка'] else ''
-                        department = ad_info.get('department', 'Общий отдел') if ad_info and ad_info.get('department') not in ['Не указано', 'Ошибка'] else 'Общий отдел'
-                        position = ad_info.get('position', '') if ad_info and ad_info.get('position') not in ['Не указано', 'Ошибка'] else ''
-                        
-                        # Формируем полное имя
                         name_parts = [surname, fst_name, sec_name]
                         constructed_full_name = ' '.join(filter(None, name_parts)) if any(name_parts) else full_name
-                        
-                        ku = KerberosUser(
+                        user = User(
                             username=username.lower(),
                             principal=principal,
                             realm=realm,
@@ -173,48 +170,14 @@ class RealKerberosAuth:
                             department=department,
                             position=position,
                             email=f"{username.lower()}@company.com",
-                            role=role,
+                            role='user',
                             is_active=True,
                             last_login=datetime.now()
-                        )
-                        session.add(ku)
-                    
-                    # Обновляем или создаем User
-                    user = session.query(User).filter(User.username == username.lower()).first()
-                    if user:
-                        # Обновляем существующего пользователя
-                        if ad_info:
-                            user.surname = ad_info.get('sur_name', '') if ad_info.get('sur_name') not in ['Не указано', 'Ошибка'] else user.surname
-                            user.fst_name = ad_info.get('first_name', '') if ad_info.get('first_name') not in ['Не указано', 'Ошибка'] else user.fst_name
-                            user.sec_name = ad_info.get('second_name', '') if ad_info.get('second_name') not in ['Не указано', 'Ошибка'] else user.sec_name
-                            user.department = ad_info.get('department', user.department) if ad_info.get('department') not in ['Не указано', 'Ошибка'] else user.department
-                            user.position = ad_info.get('position', '') if ad_info.get('position') not in ['Не указано', 'Ошибка'] else user.position
-                            user.full_name = user._get_full_name_from_parts() if (user.surname or user.fst_name) else user.full_name
-                    else:
-                        # Создаем нового User
-                        surname = ad_info.get('sur_name', '') if ad_info and ad_info.get('sur_name') not in ['Не указано', 'Ошибка'] else ''
-                        fst_name = ad_info.get('first_name', '') if ad_info and ad_info.get('first_name') not in ['Не указано', 'Ошибка'] else ''
-                        sec_name = ad_info.get('second_name', '') if ad_info and ad_info.get('second_name') not in ['Не указано', 'Ошибка'] else ''
-                        department = ad_info.get('department', 'Общий отдел') if ad_info and ad_info.get('department') not in ['Не указано', 'Ошибка'] else 'Общий отдел'
-                        position = ad_info.get('position', '') if ad_info and ad_info.get('position') not in ['Не указано', 'Ошибка'] else ''
-                        
-                        name_parts = [surname, fst_name, sec_name]
-                        constructed_full_name = ' '.join(filter(None, name_parts)) if any(name_parts) else username
-                        
-                        user = User(
-                            username=username.lower(),
-                            surname=surname,
-                            fst_name=fst_name,
-                            sec_name=sec_name,
-                            full_name=constructed_full_name,
-                            department=department,
-                            position=position,
-                            email=f"{username.lower()}@company.com",
-                            is_active=True
                         )
                         session.add(user)
                     
                     session.commit()
+                    role = user.role or 'user'
                 except Exception as e:
                     session.rollback()
                     self.logger.error(f"Failed to update user in DB: {e}")

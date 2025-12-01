@@ -21,7 +21,7 @@
           <div class="labels">
             <h1 class="site-name">Образовательный</h1>
             <h2 class="site-subtitle">портал ГТНГ</h2>
-            <span class="admin-label">admin</span>
+            <span class="admin-label" id="role-label">admin</span>
           </div>
         </div>
         <nav class="navigation">
@@ -35,7 +35,7 @@
           </ul>
         </nav>
         <div class="user-info">
-          <span class="user-name">пользователь</span>
+          <span class="user-name" id="header-username">пользователь</span>
           <div class="user-icon">
             <img src="/users-info-pg/img/vector.svg" alt="User icon" />
           </div>
@@ -85,14 +85,16 @@
                   <tr>
                     <th>Пользователь</th>
                     <th>Отдел</th>
+                    <th>Должность</th>
                     <th>Курсы</th>
-                    <th>Прогресс</th>
+                    <th>Уроки</th>
+                    <th>Роль</th>
                     <th>Статус</th>
                   </tr>
                 </thead>
                 <tbody id="users-table-body">
                   <tr>
-                    <td colspan="5" class="loading">Загрузка данных...</td>
+                    <td colspan="7" class="loading">Загрузка данных...</td>
                   </tr>
                 </tbody>
               </table>
@@ -130,6 +132,11 @@
       const refreshBtn = document.getElementById('refresh-btn');
       const exportBtn = document.getElementById('export-btn');
       const usersTableBody = document.getElementById('users-table-body');
+      const headerUserName = document.getElementById('header-username');
+      const headerRoleLabel = document.getElementById('role-label');
+      
+      let currentUser = null;
+      let isAdmin = false;
       
       // Статистика
       const totalUsersEl = document.getElementById('total-users');
@@ -140,18 +147,37 @@
       // Загрузка данных
       async function loadData() {
         try {
-          // Загружаем статистику
+          await loadCurrentUser();
           await loadStatistics();
-          
-          // Загружаем отделы
           await loadDepartments();
-          
-          // Загружаем пользователей
           await loadUsers();
           
         } catch (error) {
           console.error('Ошибка загрузки данных:', error);
           showError('Ошибка загрузки данных');
+        }
+      }
+
+      async function loadCurrentUser() {
+        try {
+          const response = await fetch(`${API_BASE}/current-user`);
+          if (!response.ok) {
+            currentUser = null;
+            isAdmin = false;
+            return;
+          }
+          currentUser = await response.json();
+          isAdmin = (currentUser.role || '').toLowerCase() === 'admin';
+          if (headerUserName && currentUser.full_name) {
+            headerUserName.textContent = currentUser.full_name;
+          }
+          if (headerRoleLabel) {
+            headerRoleLabel.textContent = isAdmin ? 'администратор' : 'пользователь';
+          }
+        } catch (error) {
+          console.warn('Не удалось получить данные текущего пользователя:', error);
+          currentUser = null;
+          isAdmin = false;
         }
       }
       
@@ -208,27 +234,50 @@
       function renderUsersTable(users) {
         usersTableBody.innerHTML = '';
         
-        if (users.length === 0) {
-          usersTableBody.innerHTML = '<tr><td colspan="5" class="no-data">Пользователи не найдены</td></tr>';
+        if (!Array.isArray(users) || users.length === 0) {
+          usersTableBody.innerHTML = '<tr><td colspan="7" class="no-data">Пользователи не найдены</td></tr>';
           return;
         }
         
         users.forEach(user => {
           const row = document.createElement('tr');
           
-          // Прогресс по курсам
-          const totalCourses = user.course_progress ? user.course_progress.length : 0;
-          const completedCourses = user.course_progress ? user.course_progress.filter(cp => cp.is_completed).length : 0;
-          const totalLessons = user.course_progress ? user.course_progress.reduce((sum, cp) => sum + cp.lessons_completed, 0) : 0;
+          const totalCourses = Array.isArray(user.course_progress) ? user.course_progress.length : 0;
+          const completedCourses = Array.isArray(user.course_progress)
+            ? user.course_progress.filter(cp => cp.is_completed).length
+            : 0;
+          const totalLessons = Array.isArray(user.course_progress)
+            ? user.course_progress.reduce((sum, cp) => sum + (cp.lessons_completed || 0), 0)
+            : 0;
+          
+          const department = user.department || 'Не указан';
+          const position = user.position || 'Не указана';
+          const fullName = user.full_name || '—';
+          const username = user.username ? `@${user.username}` : '—';
+          
+          const normalizedRole = (user.role || 'user').toLowerCase();
+          const roleLabel = normalizedRole === 'admin' ? 'Администратор' : 'Пользователь';
+          const roleClass = normalizedRole === 'admin' ? 'role-admin' : 'role-user';
+          const isSelf = currentUser && user.id === currentUser.id;
+
+          const roleControl = (isAdmin && !isSelf)
+            ? `
+              <select class="role-select" data-user-id="${user.id}" data-current-role="${normalizedRole}">
+                <option value="admin" ${normalizedRole === 'admin' ? 'selected' : ''}>Администратор</option>
+                <option value="user" ${normalizedRole === 'user' ? 'selected' : ''}>Пользователь</option>
+              </select>
+            `
+            : `<span class="role-badge ${roleClass}">${roleLabel}</span>`;
           
           row.innerHTML = `
             <td>
               <div class="user-info">
-                <strong>${user.full_name}</strong>
-                <small>@${user.username}</small>
+                <strong>${fullName}</strong>
+                <small>${username}</small>
               </div>
             </td>
-            <td>${user.department}</td>
+            <td>${department}</td>
+            <td>${position}</td>
             <td>
               <div class="courses-info">
                 <span class="courses-count">${completedCourses}/${totalCourses}</span>
@@ -242,19 +291,72 @@
               </div>
             </td>
             <td>
+              ${roleControl}
+            </td>
+            <td>
               <span class="status-badge ${user.is_active ? 'active' : 'inactive'}">
                 ${user.is_active ? 'Активен' : 'Неактивен'}
               </span>
             </td>
           `;
           
-          // Добавляем обработчик клика для детальной информации
           row.addEventListener('click', () => {
             showUserDetails(user.id);
           });
+
+          const roleSelect = row.querySelector('.role-select');
+          if (roleSelect) {
+            roleSelect.addEventListener('click', (event) => {
+              event.stopPropagation();
+            });
+            roleSelect.addEventListener('change', (event) => {
+              event.stopPropagation();
+              const selectEl = event.target;
+              const newRole = selectEl.value;
+              const previousRole = selectEl.dataset.currentRole;
+              if (newRole === previousRole) {
+                return;
+              }
+              changeUserRole(parseInt(selectEl.dataset.userId, 10), newRole, selectEl);
+            });
+          }
           
           usersTableBody.appendChild(row);
         });
+      }
+
+      async function changeUserRole(userId, newRole, selectEl) {
+        const roleName = newRole === 'admin' ? 'Администратор' : 'Пользователь';
+        const confirmed = confirm(`Вы уверены, что хотите изменить роль пользователя на "${roleName}"?`);
+        if (!confirmed) {
+          selectEl.value = selectEl.dataset.currentRole;
+          return;
+        }
+        selectEl.disabled = true;
+        try {
+          const response = await fetch(`${API_BASE}/users/${userId}/role`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: newRole })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            alert(data.error || 'Не удалось изменить роль');
+            selectEl.value = selectEl.dataset.currentRole;
+            return;
+          }
+          selectEl.dataset.currentRole = newRole;
+          selectEl.classList.add('updated');
+          setTimeout(() => selectEl.classList.remove('updated'), 1000);
+        } catch (error) {
+          console.error('Ошибка изменения роли:', error);
+          alert('Произошла ошибка при изменении роли');
+          selectEl.value = selectEl.dataset.currentRole;
+        } finally {
+          selectEl.disabled = false;
+        }
       }
       
       // Показать детали пользователя
@@ -352,7 +454,7 @@
       
       // Показать ошибку
       function showError(message) {
-        usersTableBody.innerHTML = `<tr><td colspan="5" class="error">${message}</td></tr>`;
+        usersTableBody.innerHTML = `<tr><td colspan="7" class="error">${message}</td></tr>`;
       }
       
       // Обработчики событий

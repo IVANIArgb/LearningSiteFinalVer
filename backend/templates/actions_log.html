@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Журнал действий пользователей</title>
+    <link rel="stylesheet" href="/templates/css/header-footer.css" />
+    <link rel="stylesheet" href="/templates/css/override-fonts.css" />
+    <style>
+      body {
+        background-color: #f5f7fb;
+      }
+      .actions-container {
+        max-width: 1100px;
+        margin: 120px auto 80px auto;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        padding: 32px 40px;
+      }
+      .actions-container h1 {
+        margin-top: 0;
+        font-size: 32px;
+        color: #1f2937;
+      }
+      .actions-meta {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+      .actions-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .actions-table th,
+      .actions-table td {
+        text-align: left;
+        padding: 12px 16px;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 14px;
+      }
+      .actions-table th {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 600;
+      }
+      .actions-table tr:hover td {
+        background-color: #f9fafb;
+      }
+      .actions-empty {
+        text-align: center;
+        color: #6b7280;
+        padding: 32px 0;
+      }
+      @media (max-width: 768px) {
+        .actions-container {
+          margin: 120px 16px 40px 16px;
+          padding: 24px;
+        }
+        .actions-table th,
+        .actions-table td {
+          font-size: 12px;
+          padding: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screen">
+      {% include 'admin-pages/templates/partials/header.html' %}
+      <main class="actions-container">
+        <h1>Журнал действий пользователей</h1>
+        <div class="actions-meta">
+          Доступно только администраторам. Отображаются последние записи (до 500 строк).
+        </div>
+        {% if entries %}
+          <table class="actions-table">
+            <thead>
+              <tr>
+                <th>Дата и время</th>
+                <th>Описание</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in entries %}
+                {% set parts = entry.split('|', 1) %}
+                <tr>
+                  <td>{{ parts[0].strip() }}</td>
+                  <td>{{ parts[1].strip() if parts|length > 1 else '' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="actions-empty">Пока нет записей о действиях.</div>
+        {% endif %}
+      </main>
+      {% include 'admin-pages/templates/partials/footer.html' %}
+    </div>
+  </body>
+</html>
+

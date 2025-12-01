@@ -8,7 +8,13 @@
     <div class="labels">
       <h1 class="site-name">Образовательный</h1>
       <h2 class="site-subtitle">портал ГТНГ</h2>
-      <span class="user-label">admin</span>
+      <span class="user-label">
+        {% if role == 'admin' %}
+          администратор
+        {% else %}
+          пользователь
+        {% endif %}
+      </span>
     </div>
   </div>
   <nav class="navigation">
@@ -18,6 +24,7 @@
       <li><a href="/all-lessons">все уроки</a></li>
       <li><a href="/lessons-content">база знаний</a></li>
       <li><a href="/users-info">пользователи</a></li>
+      <li><a href="/actions">действия</a></li>
       <li><a href="/main">новости</a></li>
     </ul>
   </nav>

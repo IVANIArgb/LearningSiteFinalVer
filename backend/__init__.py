@@ -9,6 +9,7 @@ from .config import get_config
 from .errors import register_error_handlers
 from .routes import register_routes
 from .utils.logging_config import configure_logging
+from .utils.action_logger import init_action_logger
 from .simplified_real_kerberos_auth import init_simplified_real_kerberos_auth
 from .api import init_api
 
@@ -27,6 +28,7 @@ def create_app(env_or_config: Optional[str | Dict[str, Any]] = None) -> Flask:
 
     configure_logging(app)
     register_error_handlers(app)
+    init_action_logger(app)
     
     # Initialize Simplified Real Kerberos Authentication (ONLY)
     if app.config.get('KERBEROS_AUTH_ENABLED', True):

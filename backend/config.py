@@ -45,6 +45,12 @@ class BaseConfig:
     # Logging
     LOG_DIR = os.path.join(PROJECT_ROOT, "backend", "logs")
     LOG_FILE = os.path.join(LOG_DIR, "app.log")
+    USER_ACTION_LOG = os.path.join(LOG_DIR, "user_actions.log")
+    ACTION_LOG_SKIP_PATHS = (
+        "/static",
+        "/templates/",
+        "/backend/templates/",
+    )
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
     
     # Kerberos Authentication settings (ONLY)

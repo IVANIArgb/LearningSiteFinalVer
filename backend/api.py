@@ -9,7 +9,7 @@ from sqlalchemy import and_, or_
 
 from .models import (
     User, Course, Lesson,
-    UserCourseProgress, UserLessonProgress, KerberosUser, KerberosSession,
+    UserCourseProgress, UserLessonProgress,
     Question, Answer, QuestionAttachment, AnswerAttachment
 )
 
@@ -19,6 +19,7 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 # Глобальный менеджер базы данных
 # Используем тот же экземпляр, что и в models.py
 from .models import db_manager
+from .utils.action_logger import record_user_action
 
 
 def get_db_session() -> Session:
@@ -31,17 +32,14 @@ def get_users():
     """Получить список всех пользователей."""
     session = get_db_session()
     try:
-        # Параметры фильтрации
         department = request.args.get('department')
         search = request.args.get('search')
-        
+
         query = session.query(User)
-        
-        # Фильтр по отделу
+
         if department:
             query = query.filter(User.department.ilike(f'%{department}%'))
-        
-        # Поиск по имени или логину
+
         if search:
             query = query.filter(
                 or_(
@@ -49,16 +47,53 @@ def get_users():
                     User.username.ilike(f'%{search}%')
                 )
             )
-        
+
         users = query.all()
-        
-        return jsonify({
-            'users': [user.to_dict() for user in users],
-            'total': len(users)
-        })
-    
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        result = [user.to_dict() for user in users]
+
+        return jsonify({'users': result, 'total': len(result)})
+
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
+    finally:
+        session.close()
+
+
+@api_bp.route('/users/<int:user_id>/role', methods=['PUT'])
+def update_user_role(user_id: int):
+    """Изменить роль пользователя (доступно только администраторам)."""
+    session = get_db_session()
+    try:
+        current_user = g.get('user_info', {}) or {}
+        if current_user.get('role') != 'admin':
+            return jsonify({'error': 'Недостаточно прав для изменения роли'}), 403
+
+        payload = request.get_json(silent=True) or {}
+        new_role = (payload.get('role') or '').strip().lower()
+        if new_role not in {'admin', 'user'}:
+            return jsonify({'error': 'Недопустимая роль'}), 400
+
+        user = session.query(User).filter(User.id == user_id).first()
+        if not user:
+            return jsonify({'error': 'Пользователь не найден'}), 404
+
+        old_role = user.role
+        if old_role == new_role:
+            return jsonify({'message': 'Роль не изменилась', 'user': user.to_dict()}), 200
+
+        user.role = new_role
+
+        session.commit()
+
+        record_user_action(
+            f"изменил роль пользователя {user.username} с {old_role} на {new_role}"
+        )
+
+        return jsonify({'message': 'Роль успешно обновлена', 'user': user.to_dict()}), 200
+
+    except Exception as exc:
+        session.rollback()
+        return jsonify({'error': str(exc)}), 500
     finally:
         session.close()
 
@@ -574,24 +609,12 @@ def check_user_registration():
         if not username:
             return jsonify({'error': 'User not authenticated'}), 401
         
-        # Проверяем в основной таблице User
         user = session.query(User).filter(User.username == username).first()
-        user_exists = user is not None
-        
-        # Проверяем в таблице KerberosUser
-        kerberos_user = session.query(KerberosUser).filter(KerberosUser.username == username).first()
-        kerberos_user_exists = kerberos_user is not None
         
         return jsonify({
             'username': username,
-            'user_registered': user_exists,
-            'kerberos_user_registered': kerberos_user_exists,
+            'user_registered': bool(user),
             'user_data': user.to_dict() if user else None,
-            'kerberos_user_data': {
-                'username': kerberos_user.username,
-                'principal': kerberos_user.principal,
-                'role': kerberos_user.role
-            } if kerberos_user else None
         })
     
     except Exception as e:

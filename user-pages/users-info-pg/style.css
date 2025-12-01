@@ -181,24 +181,34 @@ html {
 
 .users-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.users-table th,
+.users-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #edf2f7;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .users-table th {
   background-color: #67add3;
-  color: white;
-  padding: 1rem;
-  text-align: left;
+  color: #fff;
   font-weight: 600;
+  font-size: 14px;
 }
 
-.users-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
+.users-table td:first-child,
+.users-table th:first-child {
+  text-align: left;
+  width: 220px;
 }
 
 .users-table tbody tr:hover {
-  background-color: #f8f9fa;
+  background-color: #f7fbff;
   cursor: pointer;
 }
 
@@ -233,21 +243,41 @@ html {
   font-size: 11px;
 }
 
+.role-badge,
 .status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.role-badge.role-admin {
+  background-color: #ffe5d9;
+  color: #b45b00;
+  text-transform: none;
+}
+
+.role-badge.role-user {
+  background-color: #e8ecff;
+  color: #2f3a8f;
+  text-transform: none;
 }
 
 .status-badge.active {
   background-color: #d4edda;
-  color: #155724;
+  color: #1b5e20;
+  text-transform: none;
 }
 
 .status-badge.inactive {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: #fdecea;
+  color: #b71c1c;
+  text-transform: none;
 }
 
 .loading, .no-data, .error {
